@@ -4,3 +4,48 @@
 [submodule "cpp/src/lib/openvdb"]
 	path = cpp/src/lib/openvdb
 	url = https://github.com/AcademySoftwareFoundation/openvdb
+[submodule "cpp/src/lib/boost/numeric/numeric_conversion"]
+	path = cpp/src/lib/boost/numeric/numeric_conversion
+	url = https://github.com/boostorg/numeric_conversion
+[submodule "cpp/src/lib/boost/boost/numeric/numeric_conversion"]
+	path = cpp/src/lib/boost/boost/numeric/numeric_conversion
+	url = https://github.com/boostorg/numeric_conversion
+[submodule "cpp/src/lib/boost_libs/numeric/numeric_conversion"]
+	path = cpp/src/lib/boost_libs/numeric/numeric_conversion
+	url = https://github.com/boostorg/numeric_conversion
+[submodule "cpp/src/lib/boost_libs/type_traits"]
+	path = cpp/src/lib/boost_libs/type_traits
+	url = https://github.com/boostorg/type_traits/
+[submodule "cpp/src/lib/boost_libs/config"]
+	path = cpp/src/lib/boost_libs/config
+	url = https://github.com/boostorg/config
+[submodule "cpp/src/lib/boost_libs/mpl"]
+	path = cpp/src/lib/boost_libs/mpl
+	url = https://github.com/boostorg/mpl
+[submodule "cpp/src/lib/boost_libs/preprocessor"]
+	path = cpp/src/lib/boost_libs/preprocessor
+	url = https://github.com/boostorg/preprocessor
+[submodule "cpp/src/lib/tbb"]
+	path = cpp/src/lib/tbb
+	url = https://github.com/wjakob/tbb
+[submodule "cpp/src/lib/boost_libs/any"]
+	path = cpp/src/lib/boost_libs/any
+	url = https://github.com/boostorg/any
+[submodule "cpp/src/lib/boost_libs/type_index"]
+	path = cpp/src/lib/boost_libs/type_index
+	url = https://github.com/boostorg/type_index
+[submodule "cpp/src/lib/boost_libs/container_hash"]
+	path = cpp/src/lib/boost_libs/container_hash
+	url = https://github.com/boostorg/container_hash
+[submodule "cpp/src/lib/boost_libs/static_assert"]
+	path = cpp/src/lib/boost_libs/static_assert
+	url = https://github.com/boostorg/static_assert
+[submodule "cpp/src/lib/boost_libs/throw_exception"]
+	path = cpp/src/lib/boost_libs/throw_exception
+	url = https://github.com/boostorg/throw_exception
+[submodule "cpp/src/lib/boost_libs/assert"]
+	path = cpp/src/lib/boost_libs/assert
+	url = https://github.com/boostorg/assert
+[submodule "cpp/src/lib/boost_libs/core"]
+	path = cpp/src/lib/boost_libs/core
+	url = https://github.com/boostorg/core

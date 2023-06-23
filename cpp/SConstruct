@@ -13,7 +13,26 @@ env = SConscript("godot-cpp/SConstruct")
 # - LINKFLAGS are for linking flags
 
 # tweak this if you want to use different folders, or more folders, to store your source code in.
-env.Append(CPPPATH=["src/"])
+env.Append(CPPPATH=[
+    "src/",
+    "src/lib/tbb/include",
+    "src/lib/boost_libs/core/include",
+    "src/lib/boost_libs/any/include",
+    "src/lib/boost_libs/assert/include",
+    "src/lib/boost_libs/config/include",
+    "src/lib/boost_libs/container_hash/include",
+    "src/lib/boost_libs/mpl/include",
+    "src/lib/boost_libs/preprocessor/include",
+    "src/lib/boost_libs/tbb/include",
+    "src/lib/boost_libs/numeric/numeric_conversion/include",
+    "src/lib/boost_libs/static_assert/include",
+    "src/lib/boost_libs/type_traits/include",
+    "src/lib/boost_libs/type_index/include",
+    "src/lib/boost_libs/throw_exception/include",
+    "src/lib/openvdb/nanovdb/",
+    "src/lib/openvdb/openvdb/",
+    "src/lib/openvdb_overrides",
+])
 sources = Glob("src/*.cpp")
 
 if env["platform"] == "macos":
