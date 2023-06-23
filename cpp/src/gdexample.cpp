@@ -4,11 +4,18 @@
 #include <openvdb/tools/LevelSetSphere.h> // replace with your own dependencies for generating the OpenVDB grid
 #include <nanovdb/util/OpenToNanoVDB.h>   // converter from OpenVDB to NanoVDB (includes NanoVDB.h and GridManager.h)
 #include <nanovdb/util/IO.h>
-// Convert an openvdb level set sphere into a nanovdb, use accessors to print out multiple values from both
-// grids and save the NanoVDB grid to file.
-// Note, main depends on BOTH OpenVDB and NanoVDB.
-int main()
+
+using namespace godot;
+
+void GDExample::_bind_methods()
 {
+}
+
+GDExample::GDExample()
+{
+    // Initialize any variables here.
+    time_passed = 0.0;
+
     try
     {
         // Create an OpenVDB grid (here a level set surface but replace this with your own code)
@@ -33,19 +40,6 @@ int main()
     {
         std::cerr << "An exception occurred: \"" << e.what() << "\"" << std::endl;
     }
-    return 0;
-}
-
-using namespace godot;
-
-void GDExample::_bind_methods()
-{
-}
-
-GDExample::GDExample()
-{
-    // Initialize any variables here.
-    time_passed = 0.0;
 }
 
 GDExample::~GDExample()
