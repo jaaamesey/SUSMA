@@ -1,3 +1,6 @@
 [submodule "cpp/godot-cpp"]
 	path = cpp/godot-cpp
 	url = https://github.com/godotengine/godot-cpp
+[submodule "cpp/src/lib/openvdb"]
+	path = cpp/src/lib/openvdb
+	url = https://github.com/AcademySoftwareFoundation/openvdb
