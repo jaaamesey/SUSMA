@@ -2,3 +2,8 @@
 .godot/
 
 _ignore/
+.vscode/c_cpp_properties.json
+
+bin/*.dll
+bin/*.lib
+bin/*.exp

@@ -1,0 +1,40 @@
+[gd_scene load_steps=6 format=3 uid="uid://buq74sffrev0c"]
+
+[ext_resource type="Texture2D" uid="uid://bgqmnenyywcu1" path="res://icon.svg" id="1_gsi0r"]
+[ext_resource type="Script" path="res://src/camera_orbit_point.gd" id="2_1kh2o"]
+
+[sub_resource type="Sky" id="Sky_it8st"]
+
+[sub_resource type="Environment" id="Environment_op73p"]
+background_mode = 1
+background_color = Color(0.262745, 0.262745, 0.568627, 1)
+sky = SubResource("Sky_it8st")
+ambient_light_source = 2
+ambient_light_color = Color(1, 1, 1, 1)
+ambient_light_energy = 1.1
+
+[sub_resource type="TorusMesh" id="TorusMesh_khogx"]
+
+[node name="main" type="Node3D"]
+
+[node name="GDExample" type="GDExample" parent="."]
+position = Vector2(163515, 163939)
+scale = Vector2(11.3714, 6.15922)
+texture = ExtResource("1_gsi0r")
+
+[node name="CameraOrbitPoint" type="Node3D" parent="."]
+script = ExtResource("2_1kh2o")
+
+[node name="XRotator" type="Node3D" parent="CameraOrbitPoint"]
+
+[node name="Camera3D" type="Camera3D" parent="CameraOrbitPoint/XRotator"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
+environment = SubResource("Environment_op73p")
+current = true
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="CameraOrbitPoint/XRotator/Camera3D"]
+transform = Transform3D(1, 0, 0, 0, -0.50071, 0.865615, 0, -0.865615, -0.50071, 0, 3.47555, -3.71106)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.61401, -0.789298, 0, 0.789298, 0.61401, 0, 0, 0)
+mesh = SubResource("TorusMesh_khogx")

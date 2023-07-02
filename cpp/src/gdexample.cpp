@@ -1,9 +1,17 @@
 #include "gdexample.h"
 #include <godot_cpp/core/class_db.hpp>
-
+#include <godot_cpp/variant/utility_functions.hpp>
+#include <godot_cpp/variant/string.hpp>
+#include <godot_cpp/variant/packed_vector3_array.hpp>
+#include <godot_cpp/variant/packed_int32_array.hpp>
+#include <godot_cpp/classes/array_mesh.hpp>
+#include <godot_cpp/classes/mesh.hpp>
+#include <godot_cpp/classes/ref.hpp>
+#include <vector>
 #include <openvdb/tools/LevelSetSphere.h> // replace with your own dependencies for generating the OpenVDB grid
-#include <nanovdb/util/OpenToNanoVDB.h>   // converter from OpenVDB to NanoVDB (includes NanoVDB.h and GridManager.h)
-#include <nanovdb/util/IO.h>
+#include <openvdb/tools/VolumeToMesh.h>
+#include <string>
+#include <iostream>
 
 using namespace godot;
 
@@ -11,47 +19,58 @@ void GDExample::_bind_methods()
 {
 }
 
+Ref<ArrayMesh> setupMesh()
+{
+    auto srcGrid = openvdb::tools::createLevelSetSphere<openvdb::FloatGrid>(1.0f, openvdb::Vec3f(0.0f), 0.01f);
+    std::vector<openvdb::Vec3s> points = {};
+    std::vector<openvdb::Vec4I> quads = {};
+    openvdb::tools::volumeToMesh(*srcGrid, points, quads);
+
+    auto outputVerts = PackedVector3Array();
+    auto outputNormals = PackedVector3Array();
+    for (auto point : points)
+    {
+        auto vert = Vector3(point.x(), point.y(), point.z());
+        outputVerts.push_back(vert);
+        outputNormals.push_back(vert.normalized());
+    }
+
+    auto outputTris = PackedInt32Array();
+    for (auto quad : quads)
+    {
+        outputTris.push_back(quad[0]);
+        outputTris.push_back(quad[1]);
+        outputTris.push_back(quad[2]);
+
+        outputTris.push_back(quad[0]);
+        outputTris.push_back(quad[2]);
+        outputTris.push_back(quad[3]);
+    }
+
+    auto surfaceArray = Array();
+    surfaceArray.resize(Mesh::ArrayType::ARRAY_MAX);
+    surfaceArray.insert(Mesh::ArrayType::ARRAY_VERTEX, outputVerts);
+    surfaceArray.insert(Mesh::ArrayType::ARRAY_NORMAL, outputNormals);
+    surfaceArray.insert(Mesh::ArrayType::ARRAY_INDEX, outputTris);
+    surfaceArray.resize(Mesh::ArrayType::ARRAY_MAX);
+
+    ArrayMesh mesh = ArrayMesh();
+    mesh.add_surface_from_arrays(Mesh::PrimitiveType::PRIMITIVE_TRIANGLES, surfaceArray);
+
+    return Ref(&mesh);
+}
+
+void GDExample::_ready()
+{
+    set_mesh(setupMesh());
+}
+
 GDExample::GDExample()
 {
-    // Initialize any variables here.
-    time_passed = 0.0;
-
-    try
-    {
-        // Create an OpenVDB grid (here a level set surface but replace this with your own code)
-        auto srcGrid = openvdb::tools::createLevelSetSphere<openvdb::FloatGrid>(100.0f, openvdb::Vec3f(0.0f), 1.0f);
-        // Convert the OpenVDB grid, srcGrid, into a NanoVDB grid handle.
-        auto handle = nanovdb::openToNanoVDB(*srcGrid);
-        // Define a (raw) pointer to the NanoVDB grid on the host. Note we match the value type of the srcGrid!
-        auto *dstGrid = handle.grid<float>();
-        if (!dstGrid)
-            throw std::runtime_error("GridHandle does not contain a grid with value type float");
-        // Get accessors for the two grids. Note that accessors only accelerate repeated access!
-        auto dstAcc = dstGrid->getAccessor();
-        auto srcAcc = srcGrid->getAccessor();
-        // Access and print out a cross-section of the narrow-band level set from the two grids
-        for (int i = 97; i < 104; ++i)
-        {
-            printf("(%3i,0,0) OpenVDB cpu: % -4.2f, NanoVDB cpu: % -4.2f\n", i, srcAcc.getValue(openvdb::Coord(i, 0, 0)), dstAcc.getValue(nanovdb::Coord(i, 0, 0)));
-        }
-        nanovdb::io::writeGrid("data/sphere.nvdb", handle); // Write the NanoVDB grid to file and throw if writing fails
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << "An exception occurred: \"" << e.what() << "\"" << std::endl;
-    }
 }
 
 GDExample::~GDExample()
 {
-    // Add your cleanup here.
 }
 
-void GDExample::_process(double delta)
-{
-    time_passed += delta;
-
-    Vector2 new_position = get_position() + Vector2(1, 1);
-
-    set_position(new_position);
-}
+void GDExample::_process(double delta) {}

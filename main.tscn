@@ -1,10 +1,58 @@
-[gd_scene load_steps=2 format=3 uid="uid://buq74sffrev0c"]
+[gd_scene load_steps=6 format=3 uid="uid://buq74sffrev0c"]
 
-[ext_resource type="Texture2D" uid="uid://bgqmnenyywcu1" path="res://icon.svg" id="1_gsi0r"]
+[ext_resource type="Script" path="res://src/camera_orbit_point.gd" id="2_1kh2o"]
+[ext_resource type="Environment" uid="uid://chawjnfe6rdua" path="res://env.tres" id="3_ttvdp"]
 
-[node name="main" type="Node"]
+[sub_resource type="TorusMesh" id="TorusMesh_khogx"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wnxop"]
+albedo_color = Color(0.760784, 0.34902, 0.211765, 1)
+roughness = 0.3
+subsurf_scatter_strength = 0.55
+subsurf_scatter_skin_mode = true
+subsurf_scatter_transmittance_enabled = true
+subsurf_scatter_transmittance_depth = 0.205
+subsurf_scatter_transmittance_boost = 0.65
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_ioywy"]
+
+[node name="main" type="Node3D"]
+
+[node name="CameraOrbitPoint" type="Node3D" parent="."]
+script = ExtResource("2_1kh2o")
+
+[node name="XRotator" type="Node3D" parent="CameraOrbitPoint"]
+
+[node name="Camera3D" type="Camera3D" parent="CameraOrbitPoint/XRotator"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
+current = true
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="CameraOrbitPoint/XRotator/Camera3D"]
+transform = Transform3D(1, 0, 0, 0, -0.980502, 0.196511, 0, -0.196511, -0.980502, -0.318733, 0.857194, -5.86869)
+light_energy = 0.48
+
+[node name="DirectionalLight3D2" type="DirectionalLight3D" parent="CameraOrbitPoint/XRotator/Camera3D"]
+transform = Transform3D(1, 0, 0, 0, 0.978111, -0.208082, 0, 0.208082, 0.978111, -0.918574, 0.749479, 1.67049)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+
+[node name="_trash" type="Node3D" parent="."]
+visible = false
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="_trash"]
+transform = Transform3D(1, 0, 0, 0, 0.61401, -0.789298, 0, 0.789298, 0.61401, 0, 0, 0)
+mesh = SubResource("TorusMesh_khogx")
+skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_wnxop")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="_trash"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.441743, 0)
+mesh = SubResource("TorusMesh_khogx")
+skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_wnxop")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = ExtResource("3_ttvdp")
 
 [node name="GDExample" type="GDExample" parent="."]
-position = Vector2(779.767, 1204)
-scale = Vector2(11.3714, 6.15922)
-texture = ExtResource("1_gsi0r")
+mesh = SubResource("ArrayMesh_ioywy")
