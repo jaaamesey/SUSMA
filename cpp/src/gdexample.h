@@ -19,6 +19,7 @@ namespace godot
 
         void _ready();
         void _process(double delta);
+        void regenMesh(double voxelSize);
     };
 
 }

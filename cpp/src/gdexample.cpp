@@ -1,6 +1,8 @@
+// Usages of IMath in OpenVDB don't seem to work without this?
+#define IMATH_HALF_NO_LOOKUP_TABLE
+
 #include "gdexample.h"
 #include <godot_cpp/core/class_db.hpp>
-#include <godot_cpp/variant/utility_functions.hpp>
 #include <godot_cpp/variant/string.hpp>
 #include <godot_cpp/variant/packed_vector3_array.hpp>
 #include <godot_cpp/variant/packed_int32_array.hpp>
@@ -10,21 +12,19 @@
 #include <vector>
 #include <openvdb/tools/LevelSetSphere.h> // replace with your own dependencies for generating the OpenVDB grid
 #include <openvdb/tools/VolumeToMesh.h>
+#include <openvdb/Grid.h>
 #include <string>
 #include <iostream>
+#include "utils.cpp"
 
 using namespace godot;
 
-void GDExample::_bind_methods()
+void GDExample::regenMesh(double voxelSize)
 {
-}
-
-Ref<ArrayMesh> setupMesh()
-{
-    auto srcGrid = openvdb::tools::createLevelSetSphere<openvdb::FloatGrid>(1.0f, openvdb::Vec3f(0.0f), 0.01f);
+    auto grid = openvdb::tools::createLevelSetSphere<openvdb::FloatGrid>(1.0, openvdb::Vec3f(0.0), voxelSize);
     std::vector<openvdb::Vec3s> points = {};
     std::vector<openvdb::Vec4I> quads = {};
-    openvdb::tools::volumeToMesh(*srcGrid, points, quads);
+    openvdb::tools::volumeToMesh(*grid, points, quads);
 
     auto outputVerts = PackedVector3Array();
     auto outputNormals = PackedVector3Array();
@@ -57,12 +57,11 @@ Ref<ArrayMesh> setupMesh()
     ArrayMesh mesh = ArrayMesh();
     mesh.add_surface_from_arrays(Mesh::PrimitiveType::PRIMITIVE_TRIANGLES, surfaceArray);
 
-    return Ref(&mesh);
+    set_mesh(Ref(&mesh));
 }
 
 void GDExample::_ready()
 {
-    set_mesh(setupMesh());
 }
 
 GDExample::GDExample()
@@ -74,3 +73,8 @@ GDExample::~GDExample()
 }
 
 void GDExample::_process(double delta) {}
+
+void GDExample::_bind_methods()
+{
+    ClassDB::bind_method(D_METHOD("regen_mesh", "voxel_size"), &GDExample::regenMesh);
+}

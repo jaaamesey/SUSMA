@@ -1,6 +1,7 @@
 [gd_scene load_steps=6 format=3 uid="uid://buq74sffrev0c"]
 
 [ext_resource type="Script" path="res://src/camera_orbit_point.gd" id="2_1kh2o"]
+[ext_resource type="Script" path="res://mesh.gd" id="3_0hjvr"]
 [ext_resource type="Environment" uid="uid://chawjnfe6rdua" path="res://env.tres" id="3_ttvdp"]
 
 [sub_resource type="TorusMesh" id="TorusMesh_khogx"]
@@ -13,8 +14,6 @@ subsurf_scatter_skin_mode = true
 subsurf_scatter_transmittance_enabled = true
 subsurf_scatter_transmittance_depth = 0.205
 subsurf_scatter_transmittance_boost = 0.65
-
-[sub_resource type="ArrayMesh" id="ArrayMesh_ioywy"]
 
 [node name="main" type="Node3D"]
 
@@ -55,4 +54,4 @@ surface_material_override/0 = SubResource("StandardMaterial3D_wnxop")
 environment = ExtResource("3_ttvdp")
 
 [node name="GDExample" type="GDExample" parent="."]
-mesh = SubResource("ArrayMesh_ioywy")
+script = ExtResource("3_0hjvr")
