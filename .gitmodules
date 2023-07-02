@@ -49,3 +49,6 @@
 [submodule "cpp/src/lib/boost_libs/core"]
 	path = cpp/src/lib/boost_libs/core
 	url = https://github.com/boostorg/core
+[submodule "cpp/src/lib/oneTBB"]
+	path = cpp/src/lib/oneTBB
+	url = https://github.com/oneapi-src/oneTBB
