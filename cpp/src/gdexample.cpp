@@ -11,6 +11,7 @@
 #include <godot_cpp/classes/ref.hpp>
 #include <vector>
 #include <openvdb/tools/LevelSetSphere.h> // replace with your own dependencies for generating the OpenVDB grid
+#include <openvdb/tools/Composite.h>
 #include <openvdb/tools/VolumeToMesh.h>
 #include <openvdb/Grid.h>
 #include <string>
@@ -22,6 +23,8 @@ using namespace godot;
 void GDExample::regenMesh(double voxelSize)
 {
     auto grid = openvdb::tools::createLevelSetSphere<openvdb::FloatGrid>(1.0, openvdb::Vec3f(0.0), voxelSize);
+    openvdb::tools::csgDifference<openvdb::FloatGrid>(*grid, *openvdb::tools::createLevelSetSphere<openvdb::FloatGrid>(0.2, openvdb::Vec3f(brushPos.x, brushPos.y, brushPos.z), voxelSize));
+
     std::vector<openvdb::Vec3s> points = {};
     std::vector<openvdb::Vec4I> quads = {};
     openvdb::tools::volumeToMesh(*grid, points, quads);
@@ -60,6 +63,11 @@ void GDExample::regenMesh(double voxelSize)
     set_mesh(Ref(&mesh));
 }
 
+void GDExample::setBrushPos(Vector3 brushPos)
+{
+    GDExample::brushPos = brushPos;
+}
+
 void GDExample::_ready()
 {
 }
@@ -77,4 +85,5 @@ void GDExample::_process(double delta) {}
 void GDExample::_bind_methods()
 {
     ClassDB::bind_method(D_METHOD("regen_mesh", "voxel_size"), &GDExample::regenMesh);
+    ClassDB::bind_method(D_METHOD("set_brush_pos", "pos"), &GDExample::setBrushPos);
 }

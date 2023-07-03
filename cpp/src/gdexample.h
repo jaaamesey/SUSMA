@@ -10,6 +10,9 @@ namespace godot
     {
         GDCLASS(GDExample, MeshInstance3D)
 
+    private:
+        Vector3 brushPos;
+
     protected:
         static void _bind_methods();
 
@@ -20,6 +23,7 @@ namespace godot
         void _ready();
         void _process(double delta);
         void regenMesh(double voxelSize);
+        void setBrushPos(Vector3 pos);
     };
 
 }

@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://buq74sffrev0c"]
+[gd_scene load_steps=7 format=3 uid="uid://buq74sffrev0c"]
 
 [ext_resource type="Script" path="res://src/camera_orbit_point.gd" id="2_1kh2o"]
 [ext_resource type="Script" path="res://mesh.gd" id="3_0hjvr"]
@@ -15,6 +15,10 @@ subsurf_scatter_transmittance_enabled = true
 subsurf_scatter_transmittance_depth = 0.205
 subsurf_scatter_transmittance_boost = 0.65
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nnuj1"]
+albedo_color = Color(0.835294, 0.396078, 0.247059, 1)
+roughness = 0.35
+
 [node name="main" type="Node3D"]
 
 [node name="CameraOrbitPoint" type="Node3D" parent="."]
@@ -28,10 +32,13 @@ current = true
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="CameraOrbitPoint/XRotator/Camera3D"]
 transform = Transform3D(1, 0, 0, 0, -0.980502, 0.196511, 0, -0.196511, -0.980502, -0.318733, 0.857194, -5.86869)
+visible = false
 light_energy = 0.48
+sky_mode = 1
 
 [node name="DirectionalLight3D2" type="DirectionalLight3D" parent="CameraOrbitPoint/XRotator/Camera3D"]
 transform = Transform3D(1, 0, 0, 0, 0.978111, -0.208082, 0, 0.208082, 0.978111, -0.918574, 0.749479, 1.67049)
+visible = false
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 
@@ -54,4 +61,5 @@ surface_material_override/0 = SubResource("StandardMaterial3D_wnxop")
 environment = ExtResource("3_ttvdp")
 
 [node name="GDExample" type="GDExample" parent="."]
+material_override = SubResource("StandardMaterial3D_nnuj1")
 script = ExtResource("3_0hjvr")

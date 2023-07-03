@@ -1,6 +1,8 @@
 extends GDExample
 
-var voxel_size := 0.4
+var voxel_size := 0.1
+
+var brush_size := 0.9
 
 func _input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed("ui_up"):
@@ -17,8 +19,20 @@ func _input(event: InputEvent) -> void:
 	print("Verts: ", mesh.get_faces().size() if mesh != null else 0)
 
 func _ready():
+	set_brush_pos(Vector3(0, 0, 999999999999))
 	regen_mesh(voxel_size)
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
+	var mouse_pos := get_viewport().get_mouse_position()
+	var camera := get_viewport().get_camera_3d()
+		#var pos: Vector3 = drop_plane.intersects_ray(camera.project_ray_origin(mouse_pos), camera.project_ray_normal(mouse_pos))
+	if Input.is_action_just_pressed("brush_size_decrease"):
+		brush_size += 0.01
+	if Input.is_action_just_pressed("brush_size_increase"):
+		brush_size -= 0.01
+	
+	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+		set_brush_pos(camera.project_position(mouse_pos, -brush_size + camera.position.z))
 	regen_mesh(voxel_size)
+
