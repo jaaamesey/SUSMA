@@ -10,7 +10,7 @@
 #include <godot_cpp/classes/mesh.hpp>
 #include <godot_cpp/classes/ref.hpp>
 #include <vector>
-#include <openvdb/tools/LevelSetSphere.h> // replace with your own dependencies for generating the OpenVDB grid
+#include <openvdb/tools/LevelSetSphere.h>
 #include <openvdb/tools/Composite.h>
 #include <openvdb/tools/VolumeToMesh.h>
 #include <openvdb/Grid.h>

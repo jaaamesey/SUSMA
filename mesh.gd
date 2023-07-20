@@ -22,11 +22,10 @@ func _ready():
 	set_brush_pos(Vector3(0, 0, 999999999999))
 	regen_mesh(voxel_size)
 	
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	var mouse_pos := get_viewport().get_mouse_position()
 	var camera := get_viewport().get_camera_3d()
-		#var pos: Vector3 = drop_plane.intersects_ray(camera.project_ray_origin(mouse_pos), camera.project_ray_normal(mouse_pos))
+
 	if Input.is_action_just_pressed("brush_size_decrease"):
 		brush_size += 0.01
 	if Input.is_action_just_pressed("brush_size_increase"):
