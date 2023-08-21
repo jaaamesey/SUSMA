@@ -12,6 +12,7 @@ namespace godot
 
     private:
         Vector3 brushPos;
+        float brushBlend;
 
     protected:
         static void _bind_methods();
@@ -24,6 +25,7 @@ namespace godot
         void _process(double delta);
         void regenMesh(double voxelSize);
         void setBrushPos(Vector3 pos);
+        void setBrushBlend(float blend);
     };
 
 }

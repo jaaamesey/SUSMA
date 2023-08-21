@@ -13,6 +13,7 @@
 #include <openvdb/tools/LevelSetSphere.h>
 #include <openvdb/tools/Composite.h>
 #include <openvdb/tools/VolumeToMesh.h>
+#include <openvdb/tools/SignedFloodFill.h>
 #include <openvdb/Grid.h>
 #include <string>
 #include <iostream>
@@ -20,11 +21,46 @@
 
 using namespace godot;
 
+inline float lerp(float start, float end, float t)
+{
+    return start + t * (end - start);
+}
+
+inline float opSmoothSubtraction(float a, float b, float k)
+{
+    float h = std::clamp(0.5 - 0.5 * (a + b) / k, 0.0, 1.0);
+    return lerp(a, -b, h) + k * h * (1.0 - h);
+}
+
+inline float sphereSDF(const openvdb::Vec3f &p, float radius)
+{
+    return (p - openvdb::Vec3f(0.0)).length() - radius;
+}
+
 void GDExample::regenMesh(double voxelSize)
 {
-    auto grid = openvdb::tools::createLevelSetSphere<openvdb::FloatGrid>(1.0, openvdb::Vec3f(0.0), voxelSize);
-    openvdb::tools::csgDifference<openvdb::FloatGrid>(*grid, *openvdb::tools::createLevelSetSphere<openvdb::FloatGrid>(0.2, openvdb::Vec3f(brushPos.x, brushPos.y, brushPos.z), voxelSize));
+    // Build level set grid
+    openvdb::FloatGrid::Ptr grid(new openvdb::FloatGrid);
+    openvdb::CoordBBox bbox(openvdb::Coord(-1.0 / voxelSize), openvdb::Coord(1.0 / voxelSize));
 
+    grid->setTransform(openvdb::math::Transform::createLinearTransform(voxelSize));
+    grid->setGridClass(openvdb::GRID_LEVEL_SET);
+    grid->setName("result");
+
+    auto accessor = grid->getAccessor();
+
+    for (auto iter = bbox.begin(); iter != bbox.end(); ++iter)
+    {
+        openvdb::Vec3f worldCoord = grid->indexToWorld(*iter);
+        accessor.setValueOn(*iter, opSmoothSubtraction(
+                                       sphereSDF(worldCoord, 0.9),
+                                       sphereSDF(worldCoord - openvdb::Vec3f(brushPos.x, brushPos.y, brushPos.z), 0.2),
+                                       brushBlend));
+    }
+
+    openvdb::tools::signedFloodFill(grid->tree());
+
+    // Output mesh to Godot
     std::vector<openvdb::Vec3s> points = {};
     std::vector<openvdb::Vec4I> quads = {};
     openvdb::tools::volumeToMesh(*grid, points, quads);
@@ -68,6 +104,11 @@ void GDExample::setBrushPos(Vector3 brushPos)
     GDExample::brushPos = brushPos;
 }
 
+void GDExample::setBrushBlend(float blend)
+{
+    GDExample::brushBlend = blend;
+}
+
 void GDExample::_ready()
 {
 }
@@ -86,4 +127,5 @@ void GDExample::_bind_methods()
 {
     ClassDB::bind_method(D_METHOD("regen_mesh", "voxel_size"), &GDExample::regenMesh);
     ClassDB::bind_method(D_METHOD("set_brush_pos", "pos"), &GDExample::setBrushPos);
+    ClassDB::bind_method(D_METHOD("set_brush_blend", "blend"), &GDExample::setBrushBlend);
 }

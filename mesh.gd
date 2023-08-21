@@ -3,6 +3,7 @@ extends GDExample
 var voxel_size := 0.1
 
 var brush_size := 0.9
+var brush_blend := 0.5
 
 func _input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed("ui_up"):
@@ -30,8 +31,14 @@ func _process(delta: float) -> void:
 		brush_size += 0.01
 	if Input.is_action_just_pressed("brush_size_increase"):
 		brush_size -= 0.01
+		
+	if Input.is_action_just_pressed("brush_blend_increase"):
+		brush_blend += 0.01
+	if Input.is_action_just_pressed("brush_blend_decrease"):
+		brush_blend -= 0.01
 	
 	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 		set_brush_pos(camera.project_position(mouse_pos, -brush_size + camera.position.z))
+		set_brush_blend(brush_blend)
 	regen_mesh(voxel_size)
 
