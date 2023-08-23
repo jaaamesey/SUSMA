@@ -52,10 +52,13 @@ void GDExample::regenMesh(double voxelSize)
     for (auto iter = bbox.begin(); iter != bbox.end(); ++iter)
     {
         openvdb::Vec3f worldCoord = grid->indexToWorld(*iter);
-        accessor.setValueOn(*iter, opSmoothSubtraction(
-                                       sphereSDF(worldCoord, 0.9),
-                                       sphereSDF(worldCoord - openvdb::Vec3f(brushPos.x, brushPos.y, brushPos.z), 0.2),
-                                       brushBlend));
+        auto sdf = sphereSDF(worldCoord, 0.9);
+        // TODO: In theory, we shouldn't need to run every operation for every voxel
+        for (auto operation : operations)
+        {
+            sdf = opSmoothSubtraction(sdf, sphereSDF(worldCoord - operation.point, 0.1), brushBlend);
+        }
+        accessor.setValueOn(*iter, sdf);
     }
 
     openvdb::tools::signedFloodFill(grid->tree());
@@ -101,6 +104,11 @@ void GDExample::regenMesh(double voxelSize)
 
 void GDExample::setBrushPos(Vector3 brushPos)
 {
+    // TODO: This isn't really the right function to start storing operations - we should not be sampling each frame of the brush being used as its own operation.
+    // A lot to improve here.
+    struct Operation operation;
+    operation.point = openvdb::Vec3f(brushPos.x, brushPos.y, brushPos.z);
+    operations.push_back(operation);
     GDExample::brushPos = brushPos;
 }
 

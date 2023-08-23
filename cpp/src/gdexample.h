@@ -2,6 +2,7 @@
 #define GDEXAMPLE_H
 
 #include <godot_cpp/classes/mesh_instance3d.hpp>
+#include <openvdb/Types.h>
 
 namespace godot
 {
@@ -13,9 +14,15 @@ namespace godot
     private:
         Vector3 brushPos;
         float brushBlend;
+        struct Operation
+        {
+            openvdb::Vec3f point;
+        };
+        std::vector<Operation> operations = {};
 
     protected:
-        static void _bind_methods();
+        static void
+        _bind_methods();
 
     public:
         GDExample();
