@@ -26,7 +26,7 @@ inline float lerp(float start, float end, float t)
     return start + t * (end - start);
 }
 
-inline float opSmoothSubtraction(float a, float b, float k)
+inline float opSmoothSubtractionSDF(float a, float b, float k)
 {
     float h = std::clamp(0.5 - 0.5 * (a + b) / k, 0.0, 1.0);
     return lerp(a, -b, h) + k * h * (1.0 - h);
@@ -56,7 +56,7 @@ void GDExample::regenMesh(double voxelSize)
         // TODO: In theory, we shouldn't need to run every operation for every voxel
         for (auto operation : operations)
         {
-            sdf = opSmoothSubtraction(sdf, sphereSDF(worldCoord - operation.point, 0.1), brushBlend);
+            sdf = opSmoothSubtractionSDF(sdf, sphereSDF(worldCoord - operation.point, 0.1), brushBlend);
         }
         accessor.setValueOn(*iter, sdf);
     }
