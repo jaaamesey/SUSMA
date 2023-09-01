@@ -1,26 +1,38 @@
-[gd_scene load_steps=7 format=3 uid="uid://buq74sffrev0c"]
+[gd_scene load_steps=8 format=3 uid="uid://buq74sffrev0c"]
 
 [ext_resource type="Script" path="res://src/camera_orbit_point.gd" id="2_1kh2o"]
 [ext_resource type="Script" path="res://mesh.gd" id="3_0hjvr"]
 [ext_resource type="Environment" uid="uid://chawjnfe6rdua" path="res://env.tres" id="3_ttvdp"]
 
-[sub_resource type="TorusMesh" id="TorusMesh_khogx"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uwpub"]
+transparency = 1
+blend_mode = 1
+depth_draw_mode = 1
+shading_mode = 0
+albedo_color = Color(1, 1, 1, 0.0392157)
+fixed_size = true
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wnxop"]
-albedo_color = Color(0.760784, 0.34902, 0.211765, 1)
-roughness = 0.3
-subsurf_scatter_strength = 0.55
-subsurf_scatter_skin_mode = true
-subsurf_scatter_transmittance_enabled = true
-subsurf_scatter_transmittance_depth = 0.205
-subsurf_scatter_transmittance_boost = 0.65
+[sub_resource type="Gradient" id="Gradient_i213h"]
+colors = PackedColorArray(1, 0, 0, 1, 1, 0.341176, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_ubmpy"]
+gradient = SubResource("Gradient_i213h")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nnuj1"]
-albedo_color = Color(0.960784, 0.443137, 0.270588, 1)
+albedo_color = Color(0.870588, 0.411765, 0.262745, 1)
 roughness = 0.2
 emission = Color(0.537255, 0.231373, 0.2, 1)
 emission_energy_multiplier = 7.15
-rim_enabled = true
+normal_scale = 1.8
+rim_tint = 0.33
+clearcoat_roughness = 0.64
+anisotropy = -1.0
+subsurf_scatter_strength = 0.8
+subsurf_scatter_texture = SubResource("GradientTexture1D_ubmpy")
+subsurf_scatter_transmittance_enabled = true
+subsurf_scatter_transmittance_color = Color(1, 0.290196, 0.847059, 1)
+subsurf_scatter_transmittance_depth = 2.909
+subsurf_scatter_transmittance_boost = 0.46
 backlight = Color(1, 1, 1, 1)
 
 [node name="main" type="Node3D"]
@@ -44,26 +56,27 @@ transform = Transform3D(1, 0, 0, 0, 0.978111, -0.208082, 0, 0.208082, 0.978111, 
 light_energy = 0.025
 sky_mode = 1
 
+[node name="Crosshair" type="Node3D" parent="CameraOrbitPoint/XRotator/Camera3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2)
+
+[node name="CSGCylinder3D" type="CSGCylinder3D" parent="CameraOrbitPoint/XRotator/Camera3D/Crosshair"]
+material_override = SubResource("StandardMaterial3D_uwpub")
+radius = 0.001
+height = 1000.0
+
+[node name="CSGCylinder3D2" type="CSGCylinder3D" parent="CameraOrbitPoint/XRotator/Camera3D/Crosshair"]
+transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+material_override = SubResource("StandardMaterial3D_uwpub")
+radius = 0.001
+height = 1000.0
+
 [node name="_trash" type="Node3D" parent="."]
 visible = false
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="_trash"]
-transform = Transform3D(1, 0, 0, 0, 0.61401, -0.789298, 0, 0.789298, 0.61401, 0, 0, 0)
-visible = false
-mesh = SubResource("TorusMesh_khogx")
-skeleton = NodePath("../..")
-surface_material_override/0 = SubResource("StandardMaterial3D_wnxop")
-
-[node name="MeshInstance3D2" type="MeshInstance3D" parent="_trash"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.441743, 0)
-visible = false
-mesh = SubResource("TorusMesh_khogx")
-skeleton = NodePath("../..")
-surface_material_override/0 = SubResource("StandardMaterial3D_wnxop")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = ExtResource("3_ttvdp")
 
-[node name="GDExample" type="GDExample" parent="."]
+[node name="GDExample" type="GDExample" parent="." node_paths=PackedStringArray("crosshair_node")]
 material_override = SubResource("StandardMaterial3D_nnuj1")
 script = ExtResource("3_0hjvr")
+crosshair_node = NodePath("../CameraOrbitPoint/XRotator/Camera3D/Crosshair")

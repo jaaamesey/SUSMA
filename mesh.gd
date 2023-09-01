@@ -1,9 +1,13 @@
 extends GDExample
 
+@export var crosshair_node: Node3D
+
 var voxel_size := 0.1
 
 var brush_distance := 0.8
 var brush_blend := 0.13
+
+var last_held_brush_pos = null # Vector3 | null
 
 
 func _input(event: InputEvent) -> void:
@@ -30,6 +34,7 @@ func _process(delta: float) -> void:
 	var mouse_pos := get_viewport().get_mouse_position()
 	var camera := get_viewport().get_camera_3d()
 
+
 	if Input.is_action_pressed("brush_distance_increase"):
 		brush_distance += 0.02 * delta
 	if Input.is_action_pressed("brush_distance_decrease"):
@@ -39,10 +44,17 @@ func _process(delta: float) -> void:
 		brush_blend += 0.02 * delta
 	if Input.is_action_pressed("brush_blend_decrease"):
 		brush_blend -= 0.02 * delta
+		
+	var brush_pos := camera.project_position(mouse_pos, -brush_distance + camera.position.z)
+	crosshair_node.global_position = brush_pos
 
 	set_brush_blend(brush_blend)
 
+	
 	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
-		set_brush_pos(camera.project_position(mouse_pos, -brush_distance + camera.position.z))
-
+		if last_held_brush_pos == null or brush_pos.distance_squared_to(last_held_brush_pos) > (0.001 * camera.position.z):
+			set_brush_pos(brush_pos)
+			last_held_brush_pos = brush_pos
+	else:
+		last_held_brush_pos = null
 	regen_mesh(voxel_size)
