@@ -19,17 +19,16 @@ namespace godot
             SUBTRACT,
         };
 
-        float brushBlend;
         struct Operation
         {
-            openvdb::Vec3f point;
+            openvdb::Vec3d point;
             OperationType type;
-            float brushSize;
-            float brushBlend;
+            double brushSize;
+            double brushBlend;
         };
         std::vector<Operation> allOperations = {};
         std::vector<Operation> pendingOperations = {};
-        openvdb::FloatGrid::Ptr grid;
+        openvdb::DoubleGrid::Ptr grid;
         double lastVoxelSize;
 
     protected:
@@ -43,7 +42,7 @@ namespace godot
         void _ready();
         void _process(double delta);
         void regenMesh(double voxelSize);
-        void pushOperation(Vector3 pos, int type, float brushSize, float brushBlend);
+        void pushOperation(Vector3 pos, int type, double brushSize, double brushBlend);
     };
 
 }

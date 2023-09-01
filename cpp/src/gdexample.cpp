@@ -21,31 +21,32 @@
 
 using namespace godot;
 
-inline float lerp(float start, float end, float t)
+inline double lerp(double start, double end, double t)
 {
     return start + t * (end - start);
 }
 
-inline float opSmoothUnionSDF(float a, float b, float k)
+inline double opSmoothUnionSDF(double a, double b, double k)
 {
-    float h = std::clamp(0.5 + 0.5 * (a - b) / k, 0.0, 1.0);
+    return std::min(a, b);
+    double h = std::clamp(0.5 + 0.5 * (a - b) / k, 0.0, 1.0);
     return lerp(a, b, h) - k * h * (1.0 - h);
 }
 
-inline float opSmoothSubtractionSDF(float a, float b, float k)
+inline double opSmoothSubtractionSDF(double a, double b, double k)
 {
-    float h = std::clamp(0.5 - 0.5 * (a + b) / k, 0.0, 1.0);
+    double h = std::clamp(0.5 - 0.5 * (a + b) / k, 0.0, 1.0);
     return lerp(a, -b, h) + k * h * (1.0 - h);
 }
 
-inline float sphereSDF(const openvdb::Vec3f &p, float radius)
+inline double sphereSDF(const openvdb::Vec3d &p, double radius)
 {
-    return (p - openvdb::Vec3f(0.0)).length() - radius;
+    return p.length() - radius;
 }
 
-inline openvdb::CoordBBox sphereBBox(const openvdb::Vec3f &p, float radius, float voxelSize)
+inline openvdb::CoordBBox sphereBBox(const openvdb::Vec3d &p, double radius, double voxelSize)
 {
-    auto safetyMultiplier = 2; // For accounting for blending between spheres
+    auto safetyMultiplier = 2.0; // For accounting for blending between spheres
     auto halfLength = safetyMultiplier * radius;
     return openvdb::CoordBBox((p.x() - halfLength) / voxelSize, (p.y() - halfLength) / voxelSize, (p.z() - halfLength) / voxelSize,
                               (p.x() + halfLength) / voxelSize, (p.y() + halfLength) / voxelSize, (p.z() + halfLength) / voxelSize);
@@ -62,7 +63,7 @@ void GDExample::regenMesh(double voxelSize)
         {
             grid.reset();
         }
-        grid = openvdb::FloatGrid::create();
+        grid = openvdb::DoubleGrid::create();
         grid->setTransform(openvdb::math::Transform::createLinearTransform(voxelSize));
         grid->setGridClass(openvdb::GRID_LEVEL_SET);
         grid->setName("result");
@@ -72,7 +73,7 @@ void GDExample::regenMesh(double voxelSize)
         auto accessor = grid->getAccessor();
         for (auto iter = bbox.begin(); iter != bbox.end(); ++iter)
         {
-            openvdb::Vec3f worldCoord = grid->indexToWorld(*iter);
+            openvdb::Vec3d worldCoord = grid->indexToWorld(*iter);
             auto sdf = sphereSDF(worldCoord, 0.9);
             accessor.setValueOn(*iter, sdf);
         }
@@ -92,7 +93,7 @@ void GDExample::regenMesh(double voxelSize)
         auto bbox = sphereBBox(operation.point, operation.brushSize, voxelSize);
         for (auto iter = bbox.begin(); iter != bbox.end(); ++iter)
         {
-            openvdb::Vec3f worldCoord = grid->indexToWorld(*iter);
+            openvdb::Vec3d worldCoord = grid->indexToWorld(*iter);
             auto sdf = accessor.getValue(*iter);
             switch (operation.type)
             {
@@ -153,10 +154,10 @@ void GDExample::regenMesh(double voxelSize)
     lastVoxelSize = voxelSize;
 }
 
-void GDExample::pushOperation(Vector3 brushPos, int type, float brushSize, float brushBlend)
+void GDExample::pushOperation(Vector3 brushPos, int type, double brushSize, double brushBlend)
 {
     struct Operation operation;
-    operation.point = openvdb::Vec3f(brushPos.x, brushPos.y, brushPos.z);
+    operation.point = openvdb::Vec3d(brushPos.x, brushPos.y, brushPos.z);
     operation.type = (OperationType)type;
     operation.brushSize = brushSize;
     operation.brushBlend = brushBlend;
