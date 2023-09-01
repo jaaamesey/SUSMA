@@ -13,11 +13,19 @@ namespace godot
         GDCLASS(GDExample, MeshInstance3D)
 
     private:
-        Vector3 brushPos;
+        enum OperationType
+        {
+            ADD,
+            SUBTRACT,
+        };
+
         float brushBlend;
         struct Operation
         {
             openvdb::Vec3f point;
+            OperationType type;
+            float brushSize;
+            float brushBlend;
         };
         std::vector<Operation> allOperations = {};
         std::vector<Operation> pendingOperations = {};
@@ -35,8 +43,7 @@ namespace godot
         void _ready();
         void _process(double delta);
         void regenMesh(double voxelSize);
-        void setBrushPos(Vector3 pos);
-        void setBrushBlend(float blend);
+        void pushOperation(Vector3 pos, int type, float brushSize, float brushBlend);
     };
 
 }

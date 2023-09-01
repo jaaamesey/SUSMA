@@ -26,6 +26,12 @@ inline float lerp(float start, float end, float t)
     return start + t * (end - start);
 }
 
+inline float opSmoothUnionSDF(float a, float b, float k)
+{
+    float h = std::clamp(0.5 + 0.5 * (a - b) / k, 0.0, 1.0);
+    return lerp(a, b, h) - k * h * (1.0 - h);
+}
+
 inline float opSmoothSubtractionSDF(float a, float b, float k)
 {
     float h = std::clamp(0.5 - 0.5 * (a + b) / k, 0.0, 1.0);
@@ -64,6 +70,7 @@ void GDExample::regenMesh(double voxelSize)
     auto accessor = grid->getAccessor();
     auto operations = shouldBuildGridFromScratch ? allOperations : pendingOperations;
 
+    // TODO: Invert this nested loop and instead iterate through operation bboxes
     for (auto iter = bbox.begin(); iter != bbox.end(); ++iter)
     {
         openvdb::Vec3f worldCoord = grid->indexToWorld(*iter);
@@ -71,7 +78,17 @@ void GDExample::regenMesh(double voxelSize)
         // TODO: In theory, we shouldn't need to run every operation for every voxel
         for (auto operation : operations)
         {
-            sdf = opSmoothSubtractionSDF(sdf, sphereSDF(worldCoord - operation.point, 0.1), brushBlend);
+            switch (operation.type)
+            {
+            case OperationType::ADD:
+                sdf = opSmoothUnionSDF(sdf, sphereSDF(worldCoord - operation.point, operation.brushSize), operation.brushBlend);
+                break;
+            case OperationType::SUBTRACT:
+                sdf = opSmoothSubtractionSDF(sdf, sphereSDF(worldCoord - operation.point, operation.brushSize), operation.brushBlend);
+                break;
+            default:
+                throw "Invalid operation";
+            }
         }
         accessor.setValueOn(*iter, sdf);
     }
@@ -119,20 +136,17 @@ void GDExample::regenMesh(double voxelSize)
     lastVoxelSize = voxelSize;
 }
 
-void GDExample::setBrushPos(Vector3 brushPos)
+void GDExample::pushOperation(Vector3 brushPos, int type, float brushSize, float brushBlend)
 {
     // TODO: This isn't really the right function to start storing operations - we should not be sampling each frame of the brush being used as its own operation.
     // A lot to improve here.
     struct Operation operation;
     operation.point = openvdb::Vec3f(brushPos.x, brushPos.y, brushPos.z);
+    operation.type = (OperationType)type;
+    operation.brushSize = brushSize;
+    operation.brushBlend = brushBlend;
     allOperations.push_back(operation);
     pendingOperations.push_back(operation);
-    GDExample::brushPos = brushPos;
-}
-
-void GDExample::setBrushBlend(float blend)
-{
-    GDExample::brushBlend = blend;
 }
 
 void GDExample::_ready()
@@ -151,7 +165,12 @@ void GDExample::_process(double delta) {}
 
 void GDExample::_bind_methods()
 {
+    ClassDB::bind_integer_constant("GDExample", "OPERATION_TYPE", "ADD", OperationType::ADD);
+    ClassDB::bind_integer_constant("GDExample", "OPERATION_TYPE", "SUBTRACT", OperationType::SUBTRACT);
+
+    auto pushOperation = D_METHOD("push_operation");
+    pushOperation.args = {"pos", "type", "brushSize", "brushBlend"};
+    ClassDB::bind_method(pushOperation, &GDExample::pushOperation);
+
     ClassDB::bind_method(D_METHOD("regen_mesh", "voxel_size"), &GDExample::regenMesh);
-    ClassDB::bind_method(D_METHOD("set_brush_pos", "pos"), &GDExample::setBrushPos);
-    ClassDB::bind_method(D_METHOD("set_brush_blend", "blend"), &GDExample::setBrushBlend);
 }

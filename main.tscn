@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://buq74sffrev0c"]
+[gd_scene load_steps=9 format=3 uid="uid://buq74sffrev0c"]
 
 [ext_resource type="Script" path="res://src/camera_orbit_point.gd" id="2_1kh2o"]
 [ext_resource type="Script" path="res://mesh.gd" id="3_0hjvr"]
@@ -11,6 +11,11 @@ depth_draw_mode = 1
 shading_mode = 0
 albedo_color = Color(1, 1, 1, 0.0392157)
 fixed_size = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8ppdb"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 1, 1, 0.0117647)
 
 [sub_resource type="Gradient" id="Gradient_i213h"]
 colors = PackedColorArray(1, 0, 0, 1, 1, 0.341176, 1, 1)
@@ -76,7 +81,14 @@ visible = false
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = ExtResource("3_ttvdp")
 
-[node name="GDExample" type="GDExample" parent="." node_paths=PackedStringArray("crosshair_node")]
+[node name="Cursor" type="CSGSphere3D" parent="."]
+radius = 1.0
+radial_segments = 20
+rings = 20
+material = SubResource("StandardMaterial3D_8ppdb")
+
+[node name="GDExample" type="GDExample" parent="." node_paths=PackedStringArray("crosshair_node", "cursor_node")]
 material_override = SubResource("StandardMaterial3D_nnuj1")
 script = ExtResource("3_0hjvr")
 crosshair_node = NodePath("../CameraOrbitPoint/XRotator/Camera3D/Crosshair")
+cursor_node = NodePath("../Cursor")
