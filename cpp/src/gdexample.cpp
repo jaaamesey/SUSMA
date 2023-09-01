@@ -40,19 +40,34 @@ inline float sphereSDF(const openvdb::Vec3f &p, float radius)
 void GDExample::regenMesh(double voxelSize)
 {
     // Build level set grid
-    openvdb::FloatGrid::Ptr grid(new openvdb::FloatGrid);
+    bool shouldBuildGridFromScratch = !grid || voxelSize != lastVoxelSize;
+
+    if (shouldBuildGridFromScratch)
+    {
+        if (grid)
+        {
+            grid.reset();
+        }
+        grid = openvdb::FloatGrid::create();
+        grid->setTransform(openvdb::math::Transform::createLinearTransform(voxelSize));
+        grid->setGridClass(openvdb::GRID_LEVEL_SET);
+        grid->setName("result");
+    }
+
+    bool canSkipRemesh = !shouldBuildGridFromScratch && pendingOperations.empty();
+    if (canSkipRemesh)
+    {
+        return;
+    }
+
     openvdb::CoordBBox bbox(openvdb::Coord(-1.0 / voxelSize), openvdb::Coord(1.0 / voxelSize));
-
-    grid->setTransform(openvdb::math::Transform::createLinearTransform(voxelSize));
-    grid->setGridClass(openvdb::GRID_LEVEL_SET);
-    grid->setName("result");
-
     auto accessor = grid->getAccessor();
+    auto operations = shouldBuildGridFromScratch ? allOperations : pendingOperations;
 
     for (auto iter = bbox.begin(); iter != bbox.end(); ++iter)
     {
         openvdb::Vec3f worldCoord = grid->indexToWorld(*iter);
-        auto sdf = sphereSDF(worldCoord, 0.9);
+        auto sdf = shouldBuildGridFromScratch ? sphereSDF(worldCoord, 0.9) : accessor.getValue(*iter);
         // TODO: In theory, we shouldn't need to run every operation for every voxel
         for (auto operation : operations)
         {
@@ -61,7 +76,7 @@ void GDExample::regenMesh(double voxelSize)
         accessor.setValueOn(*iter, sdf);
     }
 
-    openvdb::tools::signedFloodFill(grid->tree());
+    pendingOperations.clear();
 
     // Output mesh to Godot
     std::vector<openvdb::Vec3s> points = {};
@@ -100,6 +115,8 @@ void GDExample::regenMesh(double voxelSize)
     mesh.add_surface_from_arrays(Mesh::PrimitiveType::PRIMITIVE_TRIANGLES, surfaceArray);
 
     set_mesh(Ref(&mesh));
+
+    lastVoxelSize = voxelSize;
 }
 
 void GDExample::setBrushPos(Vector3 brushPos)
@@ -108,7 +125,8 @@ void GDExample::setBrushPos(Vector3 brushPos)
     // A lot to improve here.
     struct Operation operation;
     operation.point = openvdb::Vec3f(brushPos.x, brushPos.y, brushPos.z);
-    operations.push_back(operation);
+    allOperations.push_back(operation);
+    pendingOperations.push_back(operation);
     GDExample::brushPos = brushPos;
 }
 

@@ -3,6 +3,7 @@
 
 #include <godot_cpp/classes/mesh_instance3d.hpp>
 #include <openvdb/Types.h>
+#include <openvdb/openvdb.h>
 
 namespace godot
 {
@@ -18,7 +19,10 @@ namespace godot
         {
             openvdb::Vec3f point;
         };
-        std::vector<Operation> operations = {};
+        std::vector<Operation> allOperations = {};
+        std::vector<Operation> pendingOperations = {};
+        openvdb::FloatGrid::Ptr grid;
+        double lastVoxelSize;
 
     protected:
         static void
