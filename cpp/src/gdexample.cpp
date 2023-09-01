@@ -43,6 +43,14 @@ inline float sphereSDF(const openvdb::Vec3f &p, float radius)
     return (p - openvdb::Vec3f(0.0)).length() - radius;
 }
 
+inline openvdb::CoordBBox sphereBBox(const openvdb::Vec3f &p, float radius, float voxelSize)
+{
+    auto safetyMultiplier = 2; // For accounting for blending between spheres
+    auto halfLength = safetyMultiplier * radius;
+    return openvdb::CoordBBox((p.x() - halfLength) / voxelSize, (p.y() - halfLength) / voxelSize, (p.z() - halfLength) / voxelSize,
+                              (p.x() + halfLength) / voxelSize, (p.y() + halfLength) / voxelSize, (p.z() + halfLength) / voxelSize);
+}
+
 void GDExample::regenMesh(double voxelSize)
 {
     // Build level set grid
@@ -58,6 +66,16 @@ void GDExample::regenMesh(double voxelSize)
         grid->setTransform(openvdb::math::Transform::createLinearTransform(voxelSize));
         grid->setGridClass(openvdb::GRID_LEVEL_SET);
         grid->setName("result");
+
+        // Insert initial sphere
+        openvdb::CoordBBox bbox(openvdb::Coord(-1.0 / voxelSize), openvdb::Coord(1.0 / voxelSize));
+        auto accessor = grid->getAccessor();
+        for (auto iter = bbox.begin(); iter != bbox.end(); ++iter)
+        {
+            openvdb::Vec3f worldCoord = grid->indexToWorld(*iter);
+            auto sdf = sphereSDF(worldCoord, 0.9);
+            accessor.setValueOn(*iter, sdf);
+        }
     }
 
     bool canSkipRemesh = !shouldBuildGridFromScratch && pendingOperations.empty();
@@ -66,18 +84,16 @@ void GDExample::regenMesh(double voxelSize)
         return;
     }
 
-    openvdb::CoordBBox bbox(openvdb::Coord(-1.0 / voxelSize), openvdb::Coord(1.0 / voxelSize));
     auto accessor = grid->getAccessor();
     auto operations = shouldBuildGridFromScratch ? allOperations : pendingOperations;
 
-    // TODO: Invert this nested loop and instead iterate through operation bboxes
-    for (auto iter = bbox.begin(); iter != bbox.end(); ++iter)
+    for (auto operation : operations)
     {
-        openvdb::Vec3f worldCoord = grid->indexToWorld(*iter);
-        auto sdf = shouldBuildGridFromScratch ? sphereSDF(worldCoord, 0.9) : accessor.getValue(*iter);
-        // TODO: In theory, we shouldn't need to run every operation for every voxel
-        for (auto operation : operations)
+        auto bbox = sphereBBox(operation.point, operation.brushSize, voxelSize);
+        for (auto iter = bbox.begin(); iter != bbox.end(); ++iter)
         {
+            openvdb::Vec3f worldCoord = grid->indexToWorld(*iter);
+            auto sdf = accessor.getValue(*iter);
             switch (operation.type)
             {
             case OperationType::ADD:
@@ -89,9 +105,10 @@ void GDExample::regenMesh(double voxelSize)
             default:
                 throw std::exception("Invalid operation");
             }
+            accessor.setValueOn(*iter, sdf);
         }
-        accessor.setValueOn(*iter, sdf);
     }
+    openvdb::tools::signedFloodFill(grid->tree());
 
     pendingOperations.clear();
 
