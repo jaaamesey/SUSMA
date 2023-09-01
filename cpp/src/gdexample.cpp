@@ -87,7 +87,7 @@ void GDExample::regenMesh(double voxelSize)
                 sdf = opSmoothSubtractionSDF(sdf, sphereSDF(worldCoord - operation.point, operation.brushSize), operation.brushBlend);
                 break;
             default:
-                throw "Invalid operation";
+                throw std::exception("Invalid operation");
             }
         }
         accessor.setValueOn(*iter, sdf);
@@ -138,8 +138,6 @@ void GDExample::regenMesh(double voxelSize)
 
 void GDExample::pushOperation(Vector3 brushPos, int type, float brushSize, float brushBlend)
 {
-    // TODO: This isn't really the right function to start storing operations - we should not be sampling each frame of the brush being used as its own operation.
-    // A lot to improve here.
     struct Operation operation;
     operation.point = openvdb::Vec3f(brushPos.x, brushPos.y, brushPos.z);
     operation.type = (OperationType)type;
