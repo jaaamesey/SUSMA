@@ -13,7 +13,6 @@
 #include <openvdb/tools/LevelSetSphere.h>
 #include <openvdb/tools/Composite.h>
 #include <openvdb/tools/VolumeToMesh.h>
-#include <openvdb/tools/SignedFloodFill.h>
 #include <openvdb/Grid.h>
 #include <string>
 #include <iostream>
@@ -107,7 +106,6 @@ void GDExample::regenMesh(double voxelSize)
             }
             accessor.setValueOn(*iter, sdf);
         }
-        openvdb::tools::signedFloodFill(grid->tree());
     }
 
     pendingOperations.clear();
