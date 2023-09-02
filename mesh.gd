@@ -62,9 +62,9 @@ func _process(delta: float) -> void:
 		brush_size = clamp(brush_size, 0.01, 100)
 
 		if Input.is_action_pressed("brush_blend_increase"):
-			brush_blend += 0.02 * delta
+			brush_blend += 0.1 * delta
 		if Input.is_action_pressed("brush_blend_decrease"):
-			brush_blend -= 0.02 * delta
+			brush_blend -= 0.1 * delta
 		brush_blend = clamp(brush_blend, 0, 2)
 		
 		if Input.is_action_just_pressed("toggle_symmetry"):
