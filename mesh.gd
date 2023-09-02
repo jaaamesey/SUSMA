@@ -7,7 +7,7 @@ var voxel_size := 0.1
 
 var brush_size := 0.1
 var brush_distance := 0.8
-var brush_blend := 0
+var brush_blend := 0.1
 
 
 var last_held_brush_pos = null # Vector3 | null

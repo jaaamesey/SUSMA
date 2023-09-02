@@ -28,7 +28,6 @@ inline double lerp(double start, double end, double t)
 
 inline double opSmoothUnionSDF(double a, double b, double k)
 {
-    return std::min(a, b);
     double h = std::clamp(0.5 + 0.5 * (a - b) / k, 0.0, 1.0);
     return lerp(a, b, h) - k * h * (1.0 - h);
 }
@@ -46,7 +45,7 @@ inline double sphereSDF(const openvdb::Vec3d &p, double radius)
 
 inline openvdb::CoordBBox sphereBBox(const openvdb::Vec3d &p, double radius, double voxelSize)
 {
-    auto safetyMultiplier = 2.0; // For accounting for blending between spheres
+    auto safetyMultiplier = 1.5; // For accounting for blending between spheres
     auto halfLength = safetyMultiplier * radius;
     return openvdb::CoordBBox((p.x() - halfLength) / voxelSize, (p.y() - halfLength) / voxelSize, (p.z() - halfLength) / voxelSize,
                               (p.x() + halfLength) / voxelSize, (p.y() + halfLength) / voxelSize, (p.z() + halfLength) / voxelSize);
@@ -69,7 +68,7 @@ void GDExample::regenMesh(double voxelSize)
         grid->setName("result");
 
         // Insert initial sphere
-        openvdb::CoordBBox bbox(openvdb::Coord(-1.0 / voxelSize), openvdb::Coord(1.0 / voxelSize));
+        openvdb::CoordBBox bbox(openvdb::Coord(-10.0 / voxelSize), openvdb::Coord(10.0 / voxelSize));
         auto accessor = grid->getAccessor();
         for (auto iter = bbox.begin(); iter != bbox.end(); ++iter)
         {
@@ -108,8 +107,8 @@ void GDExample::regenMesh(double voxelSize)
             }
             accessor.setValueOn(*iter, sdf);
         }
+        openvdb::tools::signedFloodFill(grid->tree());
     }
-    openvdb::tools::signedFloodFill(grid->tree());
 
     pendingOperations.clear();
 
