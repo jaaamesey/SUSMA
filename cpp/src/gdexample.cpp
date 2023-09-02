@@ -13,6 +13,7 @@
 #include <openvdb/tools/LevelSetSphere.h>
 #include <openvdb/tools/Composite.h>
 #include <openvdb/tools/VolumeToMesh.h>
+#include <openvdb/tools/MultiResGrid.h>
 #include <openvdb/Grid.h>
 #include <string>
 #include <iostream>
@@ -59,16 +60,16 @@ void GDExample::regenMesh(double voxelSize)
     {
         if (grid)
         {
-            grid.reset();
+            delete grid;
         }
-        grid = openvdb::DoubleGrid::create();
-        grid->setTransform(openvdb::math::Transform::createLinearTransform(voxelSize));
+        grid = new openvdb::tools::MultiResGrid<openvdb::DoubleGrid>(10, 0, voxelSize);
+        // grid->setTransform(openvdb::math::Transform::createLinearTransform(voxelSize));
         grid->setGridClass(openvdb::GRID_LEVEL_SET);
         grid->setName("result");
 
         // Insert initial sphere
         openvdb::CoordBBox bbox(openvdb::Coord(-10.0 / voxelSize), openvdb::Coord(10.0 / voxelSize));
-        auto accessor = grid->getAccessor();
+        auto accessor = grid->tree()->getAccessor();
         for (auto iter = bbox.begin(); iter != bbox.end(); ++iter)
         {
             openvdb::Vec3d worldCoord = grid->indexToWorld(*iter);
