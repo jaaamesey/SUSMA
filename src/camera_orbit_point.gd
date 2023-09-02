@@ -33,7 +33,11 @@ func _input(event: InputEvent) -> void:
 				var mouse_vel: Vector2 = event.relative
 				x_rotator.rotate_x(-mouse_vel.y * rotate_spd)
 				rotate_y(-mouse_vel.x * rotate_spd)
+
 				
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	pass
+	if Input.is_action_pressed("rotate"):
+		var spd := 1 * delta
+		camera.position.x += (Input.get_action_strength("move_right") - Input.get_action_strength("move_left")) * spd
+		camera.position.y += (Input.get_action_strength("move_up") - Input.get_action_strength("move_down")) * spd

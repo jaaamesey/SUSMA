@@ -1,8 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://buq74sffrev0c"]
+[gd_scene load_steps=14 format=3 uid="uid://buq74sffrev0c"]
 
 [ext_resource type="Script" path="res://src/camera_orbit_point.gd" id="2_1kh2o"]
 [ext_resource type="Script" path="res://mesh.gd" id="3_0hjvr"]
+[ext_resource type="FontFile" uid="uid://dfdlqxx1ybvwp" path="res://fnt/SpaceMono-Regular.ttf" id="3_mmugm"]
 [ext_resource type="Environment" uid="uid://chawjnfe6rdua" path="res://env.tres" id="3_ttvdp"]
+[ext_resource type="FontFile" uid="uid://c6c083fv8f8d2" path="res://fnt/SpaceMono-Bold.ttf" id="5_s1qx0"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uwpub"]
 transparency = 1
@@ -12,8 +14,30 @@ shading_mode = 0
 albedo_color = Color(1, 1, 1, 0.0392157)
 fixed_size = true
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ikb57"]
+transparency = 1
+blend_mode = 1
+depth_draw_mode = 1
+shading_mode = 0
+albedo_color = Color(1, 0, 0, 0.0392157)
+fixed_size = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ev6xr"]
+transparency = 1
+blend_mode = 1
+depth_draw_mode = 1
+shading_mode = 0
+albedo_color = Color(0, 0, 1, 0.0392157)
+fixed_size = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5kkp8"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 1, 1, 0.298039)
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8ppdb"]
 transparency = 1
+cull_mode = 2
 shading_mode = 0
 albedo_color = Color(1, 1, 1, 0.0117647)
 
@@ -24,21 +48,22 @@ colors = PackedColorArray(1, 0, 0, 1, 1, 0.341176, 1, 1)
 gradient = SubResource("Gradient_i213h")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nnuj1"]
+cull_mode = 2
 albedo_color = Color(0.870588, 0.411765, 0.262745, 1)
-roughness = 0.2
+roughness = 0.15
 emission = Color(0.537255, 0.231373, 0.2, 1)
 emission_energy_multiplier = 7.15
 normal_scale = 1.8
-rim_tint = 0.33
+rim_tint = 0.28
 clearcoat_roughness = 0.64
-anisotropy = -1.0
+anisotropy = -0.4
 subsurf_scatter_strength = 0.8
+subsurf_scatter_skin_mode = true
 subsurf_scatter_texture = SubResource("GradientTexture1D_ubmpy")
 subsurf_scatter_transmittance_enabled = true
-subsurf_scatter_transmittance_color = Color(1, 0.290196, 0.847059, 1)
 subsurf_scatter_transmittance_depth = 2.909
 subsurf_scatter_transmittance_boost = 0.46
-backlight = Color(1, 1, 1, 1)
+backlight = Color(0.666667, 1, 1, 1)
 
 [node name="main" type="Node3D"]
 
@@ -75,11 +100,67 @@ material_override = SubResource("StandardMaterial3D_uwpub")
 radius = 0.001
 height = 1000.0
 
+[node name="WorldCrosshair" type="Node3D" parent="."]
+
+[node name="CSGCylinder3D" type="CSGCylinder3D" parent="WorldCrosshair"]
+material_override = SubResource("StandardMaterial3D_ikb57")
+radius = 0.002
+height = 1000.0
+
+[node name="CSGCylinder3D2" type="CSGCylinder3D" parent="WorldCrosshair"]
+transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+material_override = SubResource("StandardMaterial3D_ev6xr")
+radius = 0.002
+height = 1000.0
+
 [node name="_trash" type="Node3D" parent="."]
 visible = false
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = ExtResource("3_ttvdp")
+
+[node name="CursorDepthIndicator" type="CSGSphere3D" parent="."]
+top_level = true
+radius = 0.004
+material = SubResource("StandardMaterial3D_5kkp8")
+
+[node name="BrushSize" type="Label3D" parent="CursorDepthIndicator"]
+transform = Transform3D(0.0858738, 0, 0, 0, 0.0858738, 0, 0, 0, 0.0858738, -0.00405253, 0.0243137, -1.19209e-07)
+no_depth_test = true
+modulate = Color(1, 1, 1, 0.054902)
+text = "BRUSH SIZE"
+font = ExtResource("3_mmugm")
+font_size = 17
+outline_size = 0
+horizontal_alignment = 2
+
+[node name="BrushSizeVal" type="Label3D" parent="CursorDepthIndicator"]
+transform = Transform3D(0.0858738, 0, 0, 0, 0.0858738, 0, 0, 0, 0.0858738, -0.00382267, 0.012483, -1.19209e-07)
+no_depth_test = true
+modulate = Color(1, 1, 1, 0.054902)
+text = "1.1"
+font = ExtResource("3_mmugm")
+outline_size = 0
+horizontal_alignment = 2
+
+[node name="Z" type="Label3D" parent="CursorDepthIndicator"]
+transform = Transform3D(0.0858738, 0, 0, 0, 0.0858738, 0, 0, 0, 0.0858738, 0.00454019, 0.00291694, -1.19209e-07)
+no_depth_test = true
+modulate = Color(1, 1, 1, 0.054902)
+text = "DISTANCE"
+font = ExtResource("3_mmugm")
+font_size = 17
+outline_size = 0
+horizontal_alignment = 0
+
+[node name="ZVal" type="Label3D" parent="CursorDepthIndicator"]
+transform = Transform3D(0.0858738, 0, 0, 0, 0.0858738, 0, 0, 0, 0.0858738, 0.00546964, -0.0097892, -1.19209e-07)
+no_depth_test = true
+modulate = Color(1, 1, 1, 0.054902)
+text = "1.1"
+font = ExtResource("3_mmugm")
+outline_size = 0
+horizontal_alignment = 0
 
 [node name="Cursor" type="CSGSphere3D" parent="."]
 radius = 1.0
@@ -87,8 +168,32 @@ radial_segments = 20
 rings = 20
 material = SubResource("StandardMaterial3D_8ppdb")
 
-[node name="GDExample" type="GDExample" parent="." node_paths=PackedStringArray("crosshair_node", "cursor_node")]
+[node name="GDExample" type="GDExample" parent="." node_paths=PackedStringArray("crosshair_node", "world_crosshair_node", "cursor_node", "cursor_depth_indicator_node", "brush_size_label_node", "z_label_node", "sculpt_info_label_node")]
 material_override = SubResource("StandardMaterial3D_nnuj1")
 script = ExtResource("3_0hjvr")
 crosshair_node = NodePath("../CameraOrbitPoint/XRotator/Camera3D/Crosshair")
+world_crosshair_node = NodePath("../WorldCrosshair")
 cursor_node = NodePath("../Cursor")
+cursor_depth_indicator_node = NodePath("../CursorDepthIndicator")
+brush_size_label_node = NodePath("../CursorDepthIndicator/BrushSizeVal")
+z_label_node = NodePath("../CursorDepthIndicator/ZVal")
+sculpt_info_label_node = NodePath("../Control/SculptInfo")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SculptInfo" type="RichTextLabel" parent="Control"]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 15.0
+offset_right = 358.0
+offset_bottom = 150.0
+theme_override_fonts/normal_font = ExtResource("3_mmugm")
+theme_override_fonts/bold_font = ExtResource("5_s1qx0")
+fit_content = true
+scroll_active = false

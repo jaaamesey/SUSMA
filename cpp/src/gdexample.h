@@ -28,7 +28,7 @@ namespace godot
         };
         std::vector<Operation> allOperations = {};
         std::vector<Operation> pendingOperations = {};
-        openvdb::DoubleGrid::Ptr grid;
+        openvdb::tools::MultiResGrid<openvdb::DoubleGrid> *grid;
         double lastVoxelSize;
 
     protected:
