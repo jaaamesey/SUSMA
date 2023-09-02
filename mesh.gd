@@ -36,11 +36,14 @@ func _process(delta: float) -> void:
 	var mouse_pos := get_viewport().get_mouse_position()
 	var camera := get_viewport().get_camera_3d()
 
-
+	var brush_distance_spd := 2.0
+	if Input.is_action_pressed("slow_brush_distance"):
+		brush_distance_spd *= 0.25
+		
 	if Input.is_action_pressed("brush_distance_increase"):
-		brush_distance += 0.4 * delta
+		brush_distance += brush_distance_spd * delta
 	if Input.is_action_pressed("brush_distance_decrease"):
-		brush_distance -= 0.4 * delta
+		brush_distance -= brush_distance_spd * delta
 
 	if Input.is_action_pressed("brush_blend_increase"):
 		brush_blend += 0.02 * delta
