@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://buq74sffrev0c"]
+[gd_scene load_steps=16 format=3 uid="uid://buq74sffrev0c"]
 
 [ext_resource type="Script" path="res://src/camera_orbit_point.gd" id="2_1kh2o"]
 [ext_resource type="Script" path="res://mesh.gd" id="3_0hjvr"]
@@ -14,12 +14,20 @@ shading_mode = 0
 albedo_color = Color(1, 1, 1, 0.0392157)
 fixed_size = true
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1pgub"]
+transparency = 1
+blend_mode = 1
+depth_draw_mode = 1
+shading_mode = 0
+albedo_color = Color(1, 1, 0, 0.0117647)
+fixed_size = true
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ikb57"]
 transparency = 1
 blend_mode = 1
 depth_draw_mode = 1
 shading_mode = 0
-albedo_color = Color(1, 0, 0, 0.0392157)
+albedo_color = Color(0, 1, 0, 0.0392157)
 fixed_size = true
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ev6xr"]
@@ -28,6 +36,14 @@ blend_mode = 1
 depth_draw_mode = 1
 shading_mode = 0
 albedo_color = Color(0, 0, 1, 0.0392157)
+fixed_size = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3qr8b"]
+transparency = 1
+blend_mode = 1
+depth_draw_mode = 1
+shading_mode = 0
+albedo_color = Color(1, 0, 0, 0.0392157)
 fixed_size = true
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5kkp8"]
@@ -101,15 +117,35 @@ radius = 0.001
 height = 1000.0
 
 [node name="WorldCrosshair" type="Node3D" parent="."]
+visible = false
 
 [node name="CSGCylinder3D" type="CSGCylinder3D" parent="WorldCrosshair"]
-material_override = SubResource("StandardMaterial3D_ikb57")
+material_override = SubResource("StandardMaterial3D_1pgub")
 radius = 0.002
 height = 1000.0
 
 [node name="CSGCylinder3D2" type="CSGCylinder3D" parent="WorldCrosshair"]
 transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+material_override = SubResource("StandardMaterial3D_1pgub")
+radius = 0.002
+height = 1000.0
+
+[node name="WorldGrid" type="Node3D" parent="."]
+
+[node name="CSGCylinder3D3" type="CSGCylinder3D" parent="WorldGrid"]
+material_override = SubResource("StandardMaterial3D_ikb57")
+radius = 0.002
+height = 1000.0
+
+[node name="CSGCylinder3D4" type="CSGCylinder3D" parent="WorldGrid"]
+transform = Transform3D(1.91069e-15, -4.37114e-08, 1, -1, -4.37114e-08, 0, 4.37114e-08, -1, -4.37114e-08, 0, 0, 0)
 material_override = SubResource("StandardMaterial3D_ev6xr")
+radius = 0.002
+height = 1000.0
+
+[node name="CSGCylinder3D5" type="CSGCylinder3D" parent="WorldGrid"]
+transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+material_override = SubResource("StandardMaterial3D_3qr8b")
 radius = 0.002
 height = 1000.0
 

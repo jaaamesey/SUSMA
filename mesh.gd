@@ -14,6 +14,8 @@ var brush_size := 0.1
 var brush_distance := 0.8
 var brush_blend := 0.1
 
+var x_symmetry := true
+
 
 var last_held_brush_pos = null # Vector3 | null
 
@@ -65,7 +67,9 @@ func _process(delta: float) -> void:
 			brush_blend -= 0.02 * delta
 		brush_blend = clamp(brush_blend, 0, 2)
 		
-
+		if Input.is_action_just_pressed("toggle_symmetry"):
+			x_symmetry = !x_symmetry
+	
 		
 	var brush_pos := camera.project_position(mouse_pos, -brush_distance + camera.position.z)
 	crosshair_node.global_position = brush_pos
@@ -84,6 +88,13 @@ func _process(delta: float) -> void:
 				brush_size,
 				brush_blend * brush_size,
 			)
+			if x_symmetry:
+				push_operation(
+					Vector3(-brush_pos.x, brush_pos.y, brush_pos.z), 
+					OPERATION_TYPE.ADD if Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) else OPERATION_TYPE.SUBTRACT, 
+					brush_size,
+					brush_blend * brush_size,
+				)
 			last_held_brush_pos = brush_pos
 	else:
 		last_held_brush_pos = null
@@ -99,4 +110,5 @@ func _process(delta: float) -> void:
 	sculpt_info_label_node.text += "Brush size: %3.3f\n" % brush_size
 	sculpt_info_label_node.text += "Brush distance: %3.3f\n" % brush_distance
 	sculpt_info_label_node.text += "Brush blend factor: %3.3f\n" % brush_blend
+	sculpt_info_label_node.text += "Brush symmetry (X): %s\n" % x_symmetry
 	sculpt_info_label_node.text = sculpt_info_label_node.text.to_upper()
