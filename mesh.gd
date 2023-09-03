@@ -17,7 +17,7 @@ var voxel_size := 0.1
 
 var brush_size := 0.1
 var brush_distance := 0.8
-var brush_blend := 0.1
+var brush_blend := 0.15
 
 var x_symmetry := true
 
