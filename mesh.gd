@@ -7,6 +7,7 @@ extends GDExample
 @export var brush_size_label_node: Label3D
 @export var z_label_node: Label3D
 @export var sculpt_info_label_node: RichTextLabel
+@export var xr_sculpt_info_node: Label3D
 
 @export var xr_camera: XRCamera3D
 @export var xr_left: XRController3D
@@ -115,12 +116,13 @@ func _process(delta: float) -> void:
 	
 	brush_size_label_node.text = str(brush_size).pad_decimals(2)
 	z_label_node.text = str(brush_distance).pad_decimals(2)
-	sculpt_info_label_node.text = ""
-	sculpt_info_label_node.text += "FPS: %s\n" % Engine.get_frames_per_second()
-	sculpt_info_label_node.text += "Voxel size: %s\n" % voxel_size
-	sculpt_info_label_node.text += "Vertices: %s\n" % mesh.get_faces().size() if mesh != null else 0
-	sculpt_info_label_node.text += "Brush size: %3.3f\n" % brush_size
-	sculpt_info_label_node.text += "Brush distance: %3.3f\n" % brush_distance
-	sculpt_info_label_node.text += "Brush blend factor: %3.3f\n" % brush_blend
-	sculpt_info_label_node.text += "Brush symmetry (X): %s\n" % x_symmetry
-	sculpt_info_label_node.text = sculpt_info_label_node.text.to_upper()
+	var sculpt_info = xr_sculpt_info_node if get_viewport().use_xr else sculpt_info_label_node
+	sculpt_info.text = ""
+	sculpt_info.text += "FPS: %s\n" % Engine.get_frames_per_second()
+	sculpt_info.text += "Voxel size: %s\n" % voxel_size
+	sculpt_info.text += "Vertices: %s\n" % mesh.get_faces().size() if mesh != null else 0
+	sculpt_info.text += "Brush size: %3.3f\n" % brush_size
+	sculpt_info.text += "Brush distance: %3.3f\n" % brush_distance
+	sculpt_info.text += "Brush blend factor: %3.3f\n" % brush_blend
+	sculpt_info.text += "Brush symmetry (X): %s\n" % x_symmetry
+	sculpt_info.text = sculpt_info.text.to_upper()
