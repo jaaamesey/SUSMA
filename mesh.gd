@@ -116,8 +116,11 @@ func _process(delta: float) -> void:
 	
 	brush_size_label_node.text = str(brush_size).pad_decimals(2)
 	z_label_node.text = str(brush_distance).pad_decimals(2)
+	
+	xr_sculpt_info_node.text = ""
+	sculpt_info_label_node.text = ""
+	
 	var sculpt_info = xr_sculpt_info_node if get_viewport().use_xr else sculpt_info_label_node
-	sculpt_info.text = ""
 	sculpt_info.text += "FPS: %s\n" % Engine.get_frames_per_second()
 	sculpt_info.text += "Voxel size: %s\n" % voxel_size
 	sculpt_info.text += "Vertices: %s\n" % mesh.get_faces().size() if mesh != null else 0
