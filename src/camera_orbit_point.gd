@@ -18,6 +18,9 @@ func _ready() -> void:
 
 var _has_mouse_warped := false
 func _input(event: InputEvent) -> void:
+	if Input.is_action_just_pressed("toggle_vr"):
+		get_viewport().use_xr = !get_viewport().use_xr
+		
 	var zoom_spd := 1.1
 	if Input.is_action_just_pressed("zoom_in"):
 		camera.position.z /= zoom_spd

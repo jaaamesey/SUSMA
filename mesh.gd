@@ -80,7 +80,7 @@ func _process(delta: float) -> void:
 		brush_distance += brush_distance_spd * xr_right.get_vector2("primary").y
 		
 	var brush_pos := camera.project_position(mouse_pos, -brush_distance + camera.position.z)
-	if xr_right.get_is_active():
+	if get_viewport().use_xr:
 		brush_pos = xr_right.global_position - brush_distance * xr_right.get_global_transform().basis.z
 	crosshair_node.global_position = brush_pos
 	world_crosshair_node.global_position = brush_pos
