@@ -2,10 +2,19 @@ extends Node3D
 
 @onready var x_rotator: Node3D = $XRotator
 @onready var camera: Camera3D = $XRotator/Camera3D
+@onready var xr_camera: Camera3D = $XRotator/Camera3D/XROrigin3D/XRCamera3D
+@onready var xr_left: XRController3D = $XRotator/Camera3D/XROrigin3D/LeftController
+@onready var xr_right: XRController3D = $XRotator/Camera3D/XROrigin3D/RightController
+
+@onready var xr_interface := XRServer.find_interface("OpenXR")
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
+	if !xr_interface.is_initialized():
+		xr_interface = null
+	if xr_interface:
+		print("XR interface initialized")
+		get_viewport().use_xr = true
 
 var _has_mouse_warped := false
 func _input(event: InputEvent) -> void:
@@ -41,3 +50,18 @@ func _process(delta: float) -> void:
 		var spd := 2 * delta
 		camera.position.x += (Input.get_action_strength("move_right") - Input.get_action_strength("move_left")) * spd
 		camera.position.y += (Input.get_action_strength("move_up") - Input.get_action_strength("move_down")) * spd
+	
+	if xr_interface:
+		var rotate_spd := 1 * delta
+		var ls_vec = xr_left.get_input("primary")
+		if ls_vec == null: ls_vec = Vector2()
+		var move_spd = 5 * delta
+		if xr_left.get_input("trigger") and xr_left.get_input("trigger") > 0.5:
+			camera.position.x += ls_vec.x * move_spd
+			camera.position.z += -ls_vec.y * move_spd
+		elif xr_left.get_input("grip") and xr_left.get_input("grip") > 0.5:
+			camera.position.x += ls_vec.x * move_spd
+			camera.position.y += ls_vec.y * move_spd
+		else:	
+			x_rotator.rotate_x(-ls_vec.y * rotate_spd)
+			rotate_y(-ls_vec.x * rotate_spd)

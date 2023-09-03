@@ -25,6 +25,10 @@ settings/stdout/print_fps=true
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
+[gui]
+
+theme/custom_font="res://fnt/SpaceMono-Regular.ttf"
+
 [input]
 
 zoom_in={
@@ -114,3 +118,8 @@ toggle_symmetry={
 [rendering]
 
 anti_aliasing/quality/msaa_3d=1
+
+[xr]
+
+openxr/enabled=true
+shaders/enabled=true

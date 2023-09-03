@@ -92,6 +92,22 @@ script = ExtResource("2_1kh2o")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
 current = true
 
+[node name="XROrigin3D" type="XROrigin3D" parent="CameraOrbitPoint/XRotator/Camera3D"]
+
+[node name="XRCamera3D" type="XRCamera3D" parent="CameraOrbitPoint/XRotator/Camera3D/XROrigin3D"]
+
+[node name="LeftController" type="XRController3D" parent="CameraOrbitPoint/XRotator/Camera3D/XROrigin3D"]
+tracker = &"left_hand"
+
+[node name="CSGBox3D" type="CSGBox3D" parent="CameraOrbitPoint/XRotator/Camera3D/XROrigin3D/LeftController"]
+transform = Transform3D(0.0460131, 0, 0, 0, 0.0584306, 0, 0, 0, 0.122532, 0, 0, 0.075146)
+
+[node name="RightController" type="XRController3D" parent="CameraOrbitPoint/XRotator/Camera3D/XROrigin3D"]
+tracker = &"right_hand"
+
+[node name="CSGBox3D" type="CSGBox3D" parent="CameraOrbitPoint/XRotator/Camera3D/XROrigin3D/RightController"]
+transform = Transform3D(0.0460131, 0, 0, 0, 0.0584306, 0, 0, 0, 0.122532, 0, 0, 0.075146)
+
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="CameraOrbitPoint/XRotator/Camera3D"]
 transform = Transform3D(0.266046, -0.961922, 0.0626574, -0.559056, -0.101017, 0.822953, -0.785287, -0.253973, -0.564643, -0.318733, 0.857194, -5.86869)
 light_energy = 0.102
@@ -204,7 +220,7 @@ radial_segments = 20
 rings = 20
 material = SubResource("StandardMaterial3D_8ppdb")
 
-[node name="GDExample" type="GDExample" parent="." node_paths=PackedStringArray("crosshair_node", "world_crosshair_node", "cursor_node", "cursor_depth_indicator_node", "brush_size_label_node", "z_label_node", "sculpt_info_label_node")]
+[node name="GDExample" type="GDExample" parent="." node_paths=PackedStringArray("crosshair_node", "world_crosshair_node", "cursor_node", "cursor_depth_indicator_node", "brush_size_label_node", "z_label_node", "sculpt_info_label_node", "xr_camera", "xr_left", "xr_right")]
 material_override = SubResource("StandardMaterial3D_nnuj1")
 script = ExtResource("3_0hjvr")
 crosshair_node = NodePath("../CameraOrbitPoint/XRotator/Camera3D/Crosshair")
@@ -213,23 +229,32 @@ cursor_node = NodePath("../Cursor")
 cursor_depth_indicator_node = NodePath("../CursorDepthIndicator")
 brush_size_label_node = NodePath("../CursorDepthIndicator/BrushSizeVal")
 z_label_node = NodePath("../CursorDepthIndicator/ZVal")
-sculpt_info_label_node = NodePath("../Control/SculptInfo")
+sculpt_info_label_node = NodePath("../CanvasLayer/Control/SculptInfo")
+xr_camera = NodePath("../CameraOrbitPoint/XRotator/Camera3D/XROrigin3D/XRCamera3D")
+xr_left = NodePath("../CameraOrbitPoint/XRotator/Camera3D/XROrigin3D/LeftController")
+xr_right = NodePath("../CameraOrbitPoint/XRotator/Camera3D/XROrigin3D/RightController")
 
-[node name="Control" type="Control" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = -2
+
+[node name="Control" type="Control" parent="CanvasLayer"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
-[node name="SculptInfo" type="RichTextLabel" parent="Control"]
+[node name="SculptInfo" type="RichTextLabel" parent="CanvasLayer/Control"]
 layout_mode = 0
-offset_left = 14.0
-offset_top = 15.0
-offset_right = 358.0
-offset_bottom = 150.0
+offset_left = 25.0
+offset_top = 23.0
+offset_right = 369.0
+offset_bottom = 158.0
 theme_override_fonts/normal_font = ExtResource("3_mmugm")
 theme_override_fonts/bold_font = ExtResource("5_s1qx0")
+text = "test"
 fit_content = true
 scroll_active = false

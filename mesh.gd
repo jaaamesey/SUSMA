@@ -8,6 +8,10 @@ extends GDExample
 @export var z_label_node: Label3D
 @export var sculpt_info_label_node: RichTextLabel
 
+@export var xr_camera: XRCamera3D
+@export var xr_left: XRController3D
+@export var xr_right: XRController3D
+
 var voxel_size := 0.1
 
 var brush_size := 0.1
@@ -41,17 +45,17 @@ func _ready():
 
 func _process(delta: float) -> void:
 	var mouse_pos := get_viewport().get_mouse_position()
-	var camera := get_viewport().get_camera_3d()
+	var camera := xr_camera if get_viewport().use_xr else get_viewport().get_camera_3d()
 
-	var brush_distance_spd := 2.0
+	var brush_distance_spd := 2.0 * delta
 	if Input.is_action_pressed("slow_brush_distance"):
 		brush_distance_spd *= 0.25
 	
 	if !Input.is_action_pressed("rotate"):
 		if Input.is_action_pressed("brush_distance_increase"):
-			brush_distance += brush_distance_spd * delta
+			brush_distance += brush_distance_spd
 		if Input.is_action_pressed("brush_distance_decrease"):
-			brush_distance -= brush_distance_spd * delta
+			brush_distance -= brush_distance_spd
 		if Input.is_action_just_pressed("center_z"):
 			brush_distance = 0
 		
@@ -70,8 +74,14 @@ func _process(delta: float) -> void:
 		if Input.is_action_just_pressed("toggle_symmetry"):
 			x_symmetry = !x_symmetry
 	
+	if xr_left.get_input("ax_button"):
+		brush_size += 0.3 * delta * xr_right.get_vector2("primary").y
+	else:
+		brush_distance += brush_distance_spd * xr_right.get_vector2("primary").y
 		
 	var brush_pos := camera.project_position(mouse_pos, -brush_distance + camera.position.z)
+	if xr_right.get_is_active():
+		brush_pos = xr_right.global_position - brush_distance * xr_right.get_global_transform().basis.z
 	crosshair_node.global_position = brush_pos
 	world_crosshair_node.global_position = brush_pos
 	cursor_node.global_position = brush_pos
@@ -79,19 +89,21 @@ func _process(delta: float) -> void:
 	cursor_depth_indicator_node.global_position = brush_pos
 	cursor_depth_indicator_node.global_rotation = camera.global_rotation
 
+	var is_add_held := Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) or xr_right.get_float("trigger") > 0.5
+	var is_subtract_held := Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) or xr_right.get_float("grip") > 0.5
 	
-	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) != Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
+	if is_add_held != is_subtract_held:
 		if last_held_brush_pos == null or brush_pos.distance_squared_to(last_held_brush_pos) > (0.0001 * camera.position.z):
 			push_operation(
 				brush_pos, 
-				OPERATION_TYPE.ADD if Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) else OPERATION_TYPE.SUBTRACT, 
+				OPERATION_TYPE.ADD if is_add_held else OPERATION_TYPE.SUBTRACT, 
 				brush_size,
 				brush_blend * brush_size,
 			)
 			if x_symmetry:
 				push_operation(
 					Vector3(-brush_pos.x, brush_pos.y, brush_pos.z), 
-					OPERATION_TYPE.ADD if Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) else OPERATION_TYPE.SUBTRACT, 
+					OPERATION_TYPE.ADD if is_add_held else OPERATION_TYPE.SUBTRACT, 
 					brush_size,
 					brush_blend * brush_size,
 				)
