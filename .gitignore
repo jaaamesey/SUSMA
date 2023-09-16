@@ -2,6 +2,7 @@
 .godot/
 
 _ignore/
+!*.gdignore
 .vscode/c_cpp_properties.json
 
 bin/*.dll

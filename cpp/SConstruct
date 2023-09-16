@@ -19,8 +19,8 @@ sources = Glob("src/*.cpp")
 
 # Add OpenVDB library and include paths
 env.Append(LIBS=["openvdb"])
-env.Append(LIBPATH=["C:/vcpkg\installed/x64-windows\lib"])
-env.Append(CPPPATH=["C:/vcpkg\installed/x64-windows\include"])
+env.Append(LIBPATH=["../_ignore/vcpkg/installed/x64-windows/lib"])
+env.Append(CPPPATH=["../_ignore/vcpkg/installed/x64-windows/include"])
 
 if env["platform"] == "macos":
     library = env.SharedLibrary(
