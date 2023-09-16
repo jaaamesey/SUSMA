@@ -8,3 +8,4 @@ _ignore/
 bin/*.dll
 bin/*.lib
 bin/*.exp
+bin/*.pdb
