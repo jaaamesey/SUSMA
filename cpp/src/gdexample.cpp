@@ -42,6 +42,19 @@ inline double sphereSDF(const openvdb::Vec3d &p, double radius)
     return p.length() - radius;
 }
 
+inline double distanceBetweenVectors(const openvdb::Vec3d &v1, const openvdb::Vec3d& v2) {
+    double dx = v1.x() - v2.x();
+    double dy = v1.y() - v2.y();
+    double dz = v1.z() - v2.z();
+    return std::sqrt(dx * dx + dy * dy + dz * dz);
+}
+
+inline double signedDistanceBetweenVectors(const openvdb::Vec3d &v1, const openvdb::Vec3d& v2) {
+    auto sign = v1.dot(v2) < 0 ? -1 : 1;
+    return sign * distanceBetweenVectors(v1, v2);
+}
+
+
 inline openvdb::CoordBBox sphereBBox(const openvdb::Vec3d &p, double radius, double voxelSize)
 {
     auto safetyMultiplier = 1.5; // For accounting for blending between spheres
@@ -66,15 +79,25 @@ void GDExample::regenMesh(double voxelSize)
         grid->setGridClass(openvdb::GRID_LEVEL_SET);
         grid->setName("result");
 
-        // Insert initial sphere
         openvdb::CoordBBox bbox(openvdb::Coord(-10.0 / voxelSize), openvdb::Coord(10.0 / voxelSize));
         auto accessor = grid->getAccessor();
-        for (auto iter = bbox.begin(); iter != bbox.end(); ++iter)
-        {
-            openvdb::Vec3d worldCoord = grid->indexToWorld(*iter);
-            auto sdf = sphereSDF(worldCoord, 0.9);
-            accessor.setValueOn(*iter, sdf);
-        }
+        // for (auto iter = bbox.begin(); iter != bbox.end(); ++iter) {
+        //     for (auto vert : *tempStartingMeshVerts) {
+        //         openvdb::Vec3d worldCoord = grid->indexToWorld(*iter);
+        //         auto sdf = (distanceBetweenVectors(worldCoord, vert) > voxelSize) ? 1 : -1;
+        //         accessor.setValueOn(*iter, sdf);
+        //     }
+        // }
+
+        // // Insert initial sphere
+        // openvdb::CoordBBox bbox(openvdb::Coord(-10.0 / voxelSize), openvdb::Coord(10.0 / voxelSize));
+        // auto accessor = grid->getAccessor();
+        // for (auto iter = bbox.begin(); iter != bbox.end(); ++iter)
+        // {
+        //     openvdb::Vec3d worldCoord = grid->indexToWorld(*iter);
+        //     auto sdf = sphereSDF(worldCoord, 0.9);
+        //     accessor.setValueOn(*iter, sdf);
+        // }
     }
 
     bool canSkipRemesh = !shouldBuildGridFromScratch && pendingOperations.empty();
@@ -162,6 +185,16 @@ void GDExample::pushOperation(Vector3 brushPos, int type, double brushSize, doub
     pendingOperations.push_back(operation);
 }
 
+void GDExample::tempSetStartingMesh(PackedVector3Array verts, PackedVector3Array tris)
+{
+    for (auto vert : verts) {
+        tempStartingMeshVerts->push_back(openvdb::Vec3s(vert.x, vert.y, vert.z));
+    }
+    for (auto tri : tris) {
+        tempStartingMeshTris->push_back(openvdb::Vec3I(tri.x, tri.y, tri.z));
+    }
+}
+
 void GDExample::_ready()
 {
 }
@@ -184,6 +217,10 @@ void GDExample::_bind_methods()
     auto pushOperation = D_METHOD("push_operation");
     pushOperation.args = {"pos", "type", "brushSize", "brushBlend"};
     ClassDB::bind_method(pushOperation, &GDExample::pushOperation);
+
+    auto setStartingMeshOp = D_METHOD("set_starting_mesh");
+    setStartingMeshOp.args = {"verts", "tris"};
+    ClassDB::bind_method(setStartingMeshOp, &GDExample::tempSetStartingMesh);
 
     ClassDB::bind_method(D_METHOD("regen_mesh", "voxel_size"), &GDExample::regenMesh);
 }

@@ -30,6 +30,8 @@ namespace godot
         std::vector<Operation> pendingOperations = {};
         openvdb::DoubleGrid::Ptr grid;
         double lastVoxelSize;
+        std::vector<openvdb::Vec3s> *tempStartingMeshVerts = new std::vector<openvdb::Vec3s>();
+        std::vector<openvdb::Vec3I> *tempStartingMeshTris = new std::vector<openvdb::Vec3I>();;
 
     protected:
         static void
@@ -43,6 +45,7 @@ namespace godot
         void _process(double delta);
         void regenMesh(double voxelSize);
         void pushOperation(Vector3 pos, int type, double brushSize, double brushBlend);
+        void tempSetStartingMesh(PackedVector3Array verts, PackedVector3Array tris);
     };
 
 }

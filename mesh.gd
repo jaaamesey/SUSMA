@@ -13,6 +13,8 @@ extends GDExample
 @export var xr_left: XRController3D
 @export var xr_right: XRController3D
 
+@export var open_file_dialog: FileDialog
+
 var voxel_size := 0.1
 
 var brush_size := 0.1
@@ -42,6 +44,23 @@ func _input(event: InputEvent) -> void:
 
 func _ready():
 	regen_mesh(voxel_size)
+	open_file_dialog.show()
+	open_file_dialog.connect("file_selected", 
+		func(path: String): 
+			var gltf_doc := GLTFDocument.new()
+			var gltf_state := GLTFState.new()
+			gltf_doc.append_from_file(path, gltf_state)
+			var verts := gltf_state.meshes[0].mesh.get_surface_arrays(Mesh.ARRAY_VERTEX)
+			var tris := gltf_state.meshes[0].mesh.get_surface_arrays(Mesh.ARRAY_INDEX)
+			print(verts[0][0])
+			for i in range(0, verts[0].size()):
+				push_operation(
+					verts[0][i], 
+					OPERATION_TYPE.ADD, 
+					0.1,
+					0.1,
+				)
+	)
 
 
 func _process(delta: float) -> void:
@@ -93,7 +112,7 @@ func _process(delta: float) -> void:
 	var is_add_held := Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) or xr_right.get_float("trigger") > 0.5
 	var is_subtract_held := Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) or xr_right.get_float("grip") > 0.5
 	
-	if is_add_held != is_subtract_held:
+	if !open_file_dialog.visible and is_add_held != is_subtract_held:
 		if last_held_brush_pos == null or brush_pos.distance_squared_to(last_held_brush_pos) > (0.0001 * camera.position.z):
 			push_operation(
 				brush_pos, 
