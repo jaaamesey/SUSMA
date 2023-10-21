@@ -21,6 +21,9 @@ var brush_size := 0.1
 var brush_distance := 0.8
 var brush_blend := 0.15
 
+var brush_types := ["sphere", "cube", "grab"]
+var brush_type := "sphere"
+
 var x_symmetry := true
 
 
@@ -28,6 +31,11 @@ var last_held_brush_pos = null # Vector3 | null
 
 
 func _input(event: InputEvent) -> void:
+	if Input.is_action_just_pressed("ui_right"):
+		brush_type = brush_types[(brush_types.find(brush_type) + 1) % brush_types.size()]
+	if Input.is_action_just_pressed("ui_left"):
+		brush_type = brush_types[(brush_types.find(brush_type) - 1) % brush_types.size()]
+			
 	if Input.is_action_just_pressed("ui_up"):
 		voxel_size -= 0.01 if voxel_size - 0.01 > 0 else 0.001
 	elif Input.is_action_just_pressed("ui_down"):
@@ -56,7 +64,8 @@ func _ready():
 			for i in range(0, verts[0].size()):
 				push_operation(
 					verts[0][i], 
-					OPERATION_TYPE.ADD, 
+					OPERATION_TYPE.ADD,
+					OPERATION_SHAPE.SPHERE,
 					0.1,
 					0.1,
 				)
@@ -111,12 +120,20 @@ func _process(delta: float) -> void:
 
 	var is_add_held := Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) or xr_right.get_float("trigger") > 0.5
 	var is_subtract_held := Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) or xr_right.get_float("grip") > 0.5
-	
+
+	var shape: OPERATION_SHAPE
+	match brush_type:
+		"sphere":
+			shape = OPERATION_SHAPE.SPHERE
+		"cube":
+			shape = OPERATION_SHAPE.CUBE
+
 	if !open_file_dialog.visible and is_add_held != is_subtract_held:
 		if last_held_brush_pos == null or brush_pos.distance_squared_to(last_held_brush_pos) > (0.0001 * camera.position.z):
 			push_operation(
 				brush_pos, 
 				OPERATION_TYPE.ADD if is_add_held else OPERATION_TYPE.SUBTRACT, 
+				shape,
 				brush_size,
 				brush_blend * brush_size,
 			)
@@ -124,6 +141,7 @@ func _process(delta: float) -> void:
 				push_operation(
 					Vector3(-brush_pos.x, brush_pos.y, brush_pos.z), 
 					OPERATION_TYPE.ADD if is_add_held else OPERATION_TYPE.SUBTRACT, 
+					shape,
 					brush_size,
 					brush_blend * brush_size,
 				)
@@ -143,6 +161,7 @@ func _process(delta: float) -> void:
 	sculpt_info.text += "FPS: %s\n" % Engine.get_frames_per_second()
 	sculpt_info.text += "Voxel size: %s\n" % voxel_size
 	sculpt_info.text += "Vertices: %s\n" % mesh.get_faces().size() if mesh != null else 0
+	sculpt_info.text += "Brush type: %s\n" % brush_type
 	sculpt_info.text += "Brush size: %3.3f\n" % brush_size
 	sculpt_info.text += "Brush distance: %3.3f\n" % brush_distance
 	sculpt_info.text += "Brush blend factor: %3.3f\n" % brush_blend

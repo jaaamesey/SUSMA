@@ -42,6 +42,11 @@ inline double sphereSDF(const openvdb::Vec3d &p, double radius)
     return p.length() - radius;
 }
 
+inline double cubeSDF(const openvdb::Vec3d &p, double halfWidth)
+{
+    return (p.x() > halfWidth || p.y() > halfWidth || p.z() > halfWidth) ? 1 : -1;
+}
+
 inline double distanceBetweenVectors(const openvdb::Vec3d &v1, const openvdb::Vec3d& v2) {
     double dx = v1.x() - v2.x();
     double dy = v1.y() - v2.y();
@@ -116,13 +121,25 @@ void GDExample::regenMesh(double voxelSize)
         {
             openvdb::Vec3d worldCoord = grid->indexToWorld(*iter);
             auto sdf = accessor.getValue(*iter);
+            double shapeSdf;
+            switch (operation.shape)
+            {
+            case OperationShape::SPHERE:
+                shapeSdf = sphereSDF(worldCoord - operation.point, operation.brushSize);
+                break;
+            case OperationShape::CUBE:
+                shapeSdf = cubeSDF(worldCoord - operation.point, operation.brushSize);
+                break;
+            default:
+                throw std::exception("Invalid shape");
+            }
             switch (operation.type)
             {
             case OperationType::ADD:
-                sdf = opSmoothUnionSDF(sdf, sphereSDF(worldCoord - operation.point, operation.brushSize), operation.brushBlend);
+                sdf = opSmoothUnionSDF(sdf, shapeSdf, operation.brushBlend);
                 break;
             case OperationType::SUBTRACT:
-                sdf = opSmoothSubtractionSDF(sdf, sphereSDF(worldCoord - operation.point, operation.brushSize), operation.brushBlend);
+                sdf = opSmoothSubtractionSDF(sdf, shapeSdf, operation.brushBlend);
                 break;
             default:
                 throw std::exception("Invalid operation");
@@ -174,11 +191,12 @@ void GDExample::regenMesh(double voxelSize)
     lastVoxelSize = voxelSize;
 }
 
-void GDExample::pushOperation(Vector3 brushPos, int type, double brushSize, double brushBlend)
+void GDExample::pushOperation(Vector3 brushPos, int type, int shape, double brushSize, double brushBlend)
 {
     struct Operation operation;
     operation.point = openvdb::Vec3d(brushPos.x, brushPos.y, brushPos.z);
     operation.type = (OperationType)type;
+    operation.shape = (OperationShape)shape;
     operation.brushSize = brushSize;
     operation.brushBlend = brushBlend;
     allOperations.push_back(operation);
@@ -214,8 +232,11 @@ void GDExample::_bind_methods()
     ClassDB::bind_integer_constant("GDExample", "OPERATION_TYPE", "ADD", OperationType::ADD);
     ClassDB::bind_integer_constant("GDExample", "OPERATION_TYPE", "SUBTRACT", OperationType::SUBTRACT);
 
+    ClassDB::bind_integer_constant("GDExample", "OPERATION_SHAPE", "SPHERE", OperationShape::SPHERE);
+    ClassDB::bind_integer_constant("GDExample", "OPERATION_SHAPE", "CUBE", OperationShape::CUBE);
+
     auto pushOperation = D_METHOD("push_operation");
-    pushOperation.args = {"pos", "type", "brushSize", "brushBlend"};
+    pushOperation.args = {"pos", "type", "shape", "brushSize", "brushBlend"};
     ClassDB::bind_method(pushOperation, &GDExample::pushOperation);
 
     auto setStartingMeshOp = D_METHOD("set_starting_mesh");

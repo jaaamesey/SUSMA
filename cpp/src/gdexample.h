@@ -18,11 +18,17 @@ namespace godot
             ADD,
             SUBTRACT,
         };
+        enum OperationShape
+        {
+            SPHERE,
+            CUBE,
+        };
 
         struct Operation
         {
             openvdb::Vec3d point;
             OperationType type;
+            OperationShape shape;
             double brushSize;
             double brushBlend;
         };
@@ -44,7 +50,7 @@ namespace godot
         void _ready();
         void _process(double delta);
         void regenMesh(double voxelSize);
-        void pushOperation(Vector3 pos, int type, double brushSize, double brushBlend);
+        void pushOperation(Vector3 pos, int type, int shape, double brushSize, double brushBlend);
         void tempSetStartingMesh(PackedVector3Array verts, PackedVector3Array tris);
     };
 
