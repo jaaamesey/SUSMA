@@ -60,10 +60,11 @@ func _ready():
 			gltf_doc.append_from_file(path, gltf_state)
 			var verts := gltf_state.meshes[0].mesh.get_surface_arrays(Mesh.ARRAY_VERTEX)
 			var tris := gltf_state.meshes[0].mesh.get_surface_arrays(Mesh.ARRAY_INDEX)
-			print(verts[0][0])
+
 			for i in range(0, verts[0].size()):
 				push_operation(
-					verts[0][i], 
+					verts[0][i],
+					Quaternion.IDENTITY,
 					OPERATION_TYPE.ADD,
 					OPERATION_SHAPE.SPHERE,
 					0.1,
@@ -127,11 +128,13 @@ func _process(delta: float) -> void:
 			shape = OPERATION_SHAPE.SPHERE
 		"cube":
 			shape = OPERATION_SHAPE.CUBE
-
+	
+	var brush_rotation := Quaternion.IDENTITY
 	if !open_file_dialog.visible and is_add_held != is_subtract_held:
 		if last_held_brush_pos == null or brush_pos.distance_squared_to(last_held_brush_pos) > (0.0001 * camera.position.z):
 			push_operation(
 				brush_pos, 
+				brush_rotation,
 				OPERATION_TYPE.ADD if is_add_held else OPERATION_TYPE.SUBTRACT, 
 				shape,
 				brush_size,
@@ -140,6 +143,7 @@ func _process(delta: float) -> void:
 			if x_symmetry:
 				push_operation(
 					Vector3(-brush_pos.x, brush_pos.y, brush_pos.z), 
+					brush_rotation,
 					OPERATION_TYPE.ADD if is_add_held else OPERATION_TYPE.SUBTRACT, 
 					shape,
 					brush_size,

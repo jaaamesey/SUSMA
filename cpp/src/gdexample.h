@@ -27,6 +27,7 @@ namespace godot
         struct Operation
         {
             openvdb::Vec3d point;
+            openvdb::Quatd rotation;
             OperationType type;
             OperationShape shape;
             double brushSize;
@@ -50,7 +51,7 @@ namespace godot
         void _ready();
         void _process(double delta);
         void regenMesh(double voxelSize);
-        void pushOperation(Vector3 pos, int type, int shape, double brushSize, double brushBlend);
+        void pushOperation(Vector3 pos, Quaternion rotation, int type, int shape, double brushSize, double brushBlend);
         void tempSetStartingMesh(PackedVector3Array verts, PackedVector3Array tris);
     };
 

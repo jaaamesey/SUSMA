@@ -44,7 +44,13 @@ inline double sphereSDF(const openvdb::Vec3d &p, double radius)
 
 inline double cubeSDF(const openvdb::Vec3d &p, double halfWidth)
 {
-    return (p.x() > halfWidth || p.y() > halfWidth || p.z() > halfWidth) ? 1 : -1;
+    openvdb::Vec3d halfSize = openvdb::Vec3d(halfWidth, halfWidth, halfWidth) * 0.5;
+    openvdb::Vec3d d = openvdb::Vec3d(std::abs(p.x()), std::abs(p.y()), std::abs(p.z())) - halfSize;
+    
+    double insideCube = fmin(fmax(d.x(), fmax(d.y(), d.z())), 0.0);
+    double outsideCube = (d - insideCube).length();
+    
+    return insideCube + outsideCube;
 }
 
 inline double distanceBetweenVectors(const openvdb::Vec3d &v1, const openvdb::Vec3d& v2) {
@@ -87,11 +93,8 @@ void GDExample::regenMesh(double voxelSize)
         openvdb::CoordBBox bbox(openvdb::Coord(-10.0 / voxelSize), openvdb::Coord(10.0 / voxelSize));
         auto accessor = grid->getAccessor();
         // for (auto iter = bbox.begin(); iter != bbox.end(); ++iter) {
-        //     for (auto vert : *tempStartingMeshVerts) {
-        //         openvdb::Vec3d worldCoord = grid->indexToWorld(*iter);
-        //         auto sdf = (distanceBetweenVectors(worldCoord, vert) > voxelSize) ? 1 : -1;
-        //         accessor.setValueOn(*iter, sdf);
-        //     }
+        //     openvdb::Vec3d worldCoord = grid->indexToWorld(*iter);
+        //     accessor.setValueOn(*iter, sdf);
         // }
 
         // // Insert initial sphere
@@ -121,14 +124,15 @@ void GDExample::regenMesh(double voxelSize)
         {
             openvdb::Vec3d worldCoord = grid->indexToWorld(*iter);
             auto sdf = accessor.getValue(*iter);
+            auto point = operation.rotation.rotateVector(worldCoord - operation.point);
             double shapeSdf;
             switch (operation.shape)
             {
             case OperationShape::SPHERE:
-                shapeSdf = sphereSDF(worldCoord - operation.point, operation.brushSize);
+                shapeSdf = sphereSDF(point, operation.brushSize);
                 break;
             case OperationShape::CUBE:
-                shapeSdf = cubeSDF(worldCoord - operation.point, operation.brushSize);
+                shapeSdf = cubeSDF(point, operation.brushSize);
                 break;
             default:
                 throw std::exception("Invalid shape");
@@ -191,10 +195,11 @@ void GDExample::regenMesh(double voxelSize)
     lastVoxelSize = voxelSize;
 }
 
-void GDExample::pushOperation(Vector3 brushPos, int type, int shape, double brushSize, double brushBlend)
+void GDExample::pushOperation(Vector3 brushPos, Quaternion brushRotation, int type, int shape, double brushSize, double brushBlend)
 {
     struct Operation operation;
     operation.point = openvdb::Vec3d(brushPos.x, brushPos.y, brushPos.z);
+    operation.rotation = openvdb::Quatd(brushRotation.x, brushRotation.y, brushRotation.z, brushRotation.w);
     operation.type = (OperationType)type;
     operation.shape = (OperationShape)shape;
     operation.brushSize = brushSize;
@@ -236,7 +241,7 @@ void GDExample::_bind_methods()
     ClassDB::bind_integer_constant("GDExample", "OPERATION_SHAPE", "CUBE", OperationShape::CUBE);
 
     auto pushOperation = D_METHOD("push_operation");
-    pushOperation.args = {"pos", "type", "shape", "brushSize", "brushBlend"};
+    pushOperation.args = {"pos", "rotation", "type", "shape", "brushSize", "brushBlend"};
     ClassDB::bind_method(pushOperation, &GDExample::pushOperation);
 
     auto setStartingMeshOp = D_METHOD("set_starting_mesh");
