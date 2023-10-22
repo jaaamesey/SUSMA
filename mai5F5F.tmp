@@ -227,12 +227,6 @@ radial_segments = 20
 rings = 20
 material = ExtResource("4_kdbe2")
 
-[node name="grab" type="CSGSphere3D" parent="Cursor"]
-radius = 1.0
-radial_segments = 20
-rings = 20
-material = ExtResource("4_kdbe2")
-
 [node name="cube" type="CSGBox3D" parent="Cursor"]
 size = Vector3(2, 2, 2)
 material = ExtResource("4_kdbe2")

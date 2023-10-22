@@ -29,6 +29,7 @@ var x_symmetry := true
 
 
 var last_held_brush_pos = null # Vector3 | null
+var last_raw_brush_pos := Vector3()
 
 
 func _input(event: InputEvent) -> void:
@@ -71,6 +72,7 @@ func _ready():
 					verts[0][i],
 					Quaternion.IDENTITY,
 					Vector3.ONE,
+					Vector3.ZERO,
 					OPERATION_TYPE.ADD,
 					OPERATION_SHAPE.SPHERE,
 					0.1,
@@ -84,7 +86,7 @@ func _ready():
 			gltf_doc.append_from_scene(self, gltf_state)
 			gltf_doc.write_to_filesystem(gltf_state, path)
 	)
-	open_file_dialog.show()
+
 
 func _process(delta: float) -> void:
 	var mouse_pos := get_viewport().get_mouse_position()
@@ -127,6 +129,8 @@ func _process(delta: float) -> void:
 	if get_viewport().use_xr:
 		brush_pos = xr_right.global_position - brush_distance * xr_right.get_global_transform().basis.z
 		brush_rotation = Quaternion.from_euler(xr_right.rotation)
+	if brush_type == "grab":
+		brush_rotation = Quaternion.IDENTITY
 	crosshair_node.global_position = brush_pos
 	world_crosshair_node.global_position = brush_pos
 	cursor_node.global_position = brush_pos
@@ -139,22 +143,28 @@ func _process(delta: float) -> void:
 
 	var is_add_held := Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) or xr_right.get_float("trigger") > 0.5
 	var is_subtract_held := Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) or xr_right.get_float("grip") > 0.5
-
+	
+	var op_type := OPERATION_TYPE.ADD if is_add_held else OPERATION_TYPE.SUBTRACT
 	var shape: OPERATION_SHAPE
 	match brush_type:
 		"sphere":
 			shape = OPERATION_SHAPE.SPHERE
 		"cube":
 			shape = OPERATION_SHAPE.CUBE
-	
+		"grab":
+			op_type = OPERATION_TYPE.DRAG
+			shape = OPERATION_SHAPE.SPHERE
 
 	if !open_file_dialog.visible and is_add_held != is_subtract_held and !Input.is_action_pressed("rotate"):
+		var direction := 0.01 * (last_raw_brush_pos - brush_pos)
+
 		if last_held_brush_pos == null or brush_pos.distance_squared_to(last_held_brush_pos) > (0.0001 * camera.position.z):
 			push_operation(
 				brush_pos, 
 				brush_rotation,
 				Vector3.ONE,
-				OPERATION_TYPE.ADD if is_add_held else OPERATION_TYPE.SUBTRACT, 
+				direction,
+				op_type,
 				shape,
 				brush_size,
 				brush_blend * brush_size,
@@ -163,8 +173,9 @@ func _process(delta: float) -> void:
 				push_operation(
 					Vector3(-brush_pos.x, brush_pos.y, brush_pos.z), 
 					brush_rotation,
-					Vector3(-1, 1, 1),
-					OPERATION_TYPE.ADD if is_add_held else OPERATION_TYPE.SUBTRACT, 
+					Vector3.ONE if brush_type == "grab" else Vector3(-1, 1, 1),
+					Vector3(-direction.x, direction.y, direction.z),
+					op_type, 
 					shape,
 					brush_size,
 					brush_blend * brush_size,
@@ -172,6 +183,8 @@ func _process(delta: float) -> void:
 			last_held_brush_pos = brush_pos
 	else:
 		last_held_brush_pos = null
+		
+	last_raw_brush_pos = brush_pos
 		
 	regen_mesh(voxel_size)
 	
