@@ -110,12 +110,13 @@ func _process(delta: float) -> void:
 		brush_distance += brush_distance_spd * xr_right.get_vector2("primary").y
 		
 	var brush_pos := camera.project_position(mouse_pos, -brush_distance + camera.position.z)
-	var brush_rotation := Quaternion.from_euler(Vector3(0, 0, 0))
+	var brush_rotation := Quaternion.from_euler(Vector3(20, 10, 0))
 	if get_viewport().use_xr:
 		brush_pos = xr_right.global_position - brush_distance * xr_right.get_global_transform().basis.z
 	crosshair_node.global_position = brush_pos
 	world_crosshair_node.global_position = brush_pos
 	cursor_node.global_position = brush_pos
+	cursor_node.global_rotation = brush_rotation.inverse().get_euler()
 	cursor_node.scale = brush_size * Vector3.ONE
 	for cursor in cursor_node.get_children():
 		cursor.visible = cursor.name == brush_type
