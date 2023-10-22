@@ -48,18 +48,40 @@ inline double cubeSDF(const openvdb::Vec3d &p, double halfWidth)
     return openvdb::Vec3d(std::max(q.x(), 0.0), std::max(q.y(), 0.0), std::max(q.z(), 0.0)).length() + std::min(std::max(q.x(), std::max(q.y(), q.z())), 0.0);
 }
 
-inline double distanceBetweenVectors(const openvdb::Vec3d &v1, const openvdb::Vec3d& v2) {
+inline double triSDF(const openvdb::Vec3d &p, const openvdb::Vec3d &a, const openvdb::Vec3d &b, const openvdb::Vec3d &c)
+{
+    auto ba = b - a;
+    auto pa = p - a;
+    auto cb = c - b;
+    auto pb = p - b;
+    auto ac = a - c;
+    auto pc = p - c;
+    auto nor = ba.cross(ac);
+
+    return std::sqrt(
+        (nor.dot(pa.cross(ba)) >= 0.0 &&
+         nor.dot(pb.cross(cb)) >= 0.0 &&
+         nor.dot(pc.cross(ac)) >= 0.0)
+            ? std::min(std::min(
+                           (ba * (ba.dot(pa) / ba.lengthSqr()) - pa).lengthSqr(),
+                           (cb * (cb.dot(pb) / cb.lengthSqr()) - pb).lengthSqr()),
+                       (ac * (ac.dot(pc) / ac.lengthSqr()) - pc).lengthSqr())
+            : nor.dot(pa) * nor.dot(pa) / nor.lengthSqr()) - 0.1;
+}
+
+inline double distanceBetweenVectors(const openvdb::Vec3d &v1, const openvdb::Vec3d &v2)
+{
     double dx = v1.x() - v2.x();
     double dy = v1.y() - v2.y();
     double dz = v1.z() - v2.z();
     return std::sqrt(dx * dx + dy * dy + dz * dz);
 }
 
-inline double signedDistanceBetweenVectors(const openvdb::Vec3d &v1, const openvdb::Vec3d& v2) {
+inline double signedDistanceBetweenVectors(const openvdb::Vec3d &v1, const openvdb::Vec3d &v2)
+{
     auto sign = v1.dot(v2) < 0 ? -1 : 1;
     return sign * distanceBetweenVectors(v1, v2);
 }
-
 
 inline openvdb::CoordBBox sphereBBox(const openvdb::Vec3d &p, double radius, double voxelSize)
 {
@@ -80,8 +102,8 @@ void GDExample::regenMesh(double voxelSize)
         {
             grid.reset();
         }
-        // Use 1.0 as a background value (i.e. value of an empty SDF)
-        grid = openvdb::DoubleGrid::create(1.0);
+        // Use 1 as a background value (points of a signed distance field not in a shape are positive)
+        grid = openvdb::DoubleGrid::create(1);
         grid->setTransform(openvdb::math::Transform::createLinearTransform(voxelSize));
         grid->setGridClass(openvdb::GRID_LEVEL_SET);
         grid->setName("result");
@@ -112,6 +134,9 @@ void GDExample::regenMesh(double voxelSize)
                 break;
             case OperationShape::CUBE:
                 shapeSdf = cubeSDF(point, operation.brushSize);
+                break;
+            case OperationShape::TRIANGLE:
+                shapeSdf = triSDF(point, operation.triPoint1, operation.triPoint2, operation.triPoint3);
                 break;
             default:
                 throw std::exception("Invalid shape");
@@ -188,12 +213,35 @@ void GDExample::pushOperation(Vector3 brushPos, Quaternion brushRotation, Vector
     pendingOperations.push_back(operation);
 }
 
+void GDExample::pushTriangle(Vector3 p1, Vector3 p2, Vector3 p3)
+{
+    struct Operation operation;
+    operation.point = openvdb::Vec3d(
+        (p1.x + p2.x + p3.x) / 3.0,
+        (p1.y + p2.y + p3.y) / 3.0,
+        (p1.z + p2.z + p3.z) / 3.0
+    );
+    operation.rotation = openvdb::Quatd();
+    operation.scale = openvdb::Vec3d(1, 1, 1);
+    operation.type = OperationType::ADD;
+    operation.shape = OperationShape::TRIANGLE;
+    operation.brushBlend = 0;
+    operation.triPoint1 = openvdb::Vec3d(p1.x, p1.y, p1.z);
+    operation.triPoint2 = openvdb::Vec3d(p2.x, p2.y, p2.z);
+    operation.triPoint3 = openvdb::Vec3d(p3.x, p3.y, p3.z);
+    operation.brushSize = std::max(std::max((operation.point - operation.triPoint1).lengthSqr(), (operation.point - operation.triPoint2).lengthSqr()), (operation.point - operation.triPoint3).lengthSqr());
+    allOperations.push_back(operation);
+    pendingOperations.push_back(operation);
+}
+
 void GDExample::tempSetStartingMesh(PackedVector3Array verts, PackedVector3Array tris)
 {
-    for (auto vert : verts) {
+    for (auto vert : verts)
+    {
         tempStartingMeshVerts->push_back(openvdb::Vec3s(vert.x, vert.y, vert.z));
     }
-    for (auto tri : tris) {
+    for (auto tri : tris)
+    {
         tempStartingMeshTris->push_back(openvdb::Vec3I(tri.x, tri.y, tri.z));
     }
 }
@@ -223,6 +271,10 @@ void GDExample::_bind_methods()
     auto pushOperation = D_METHOD("push_operation");
     pushOperation.args = {"pos", "rotation", "scale", "type", "shape", "brushSize", "brushBlend"};
     ClassDB::bind_method(pushOperation, &GDExample::pushOperation);
+
+    auto pushTriOperation = D_METHOD("push_triangle");
+    pushTriOperation.args = {"p1", "p2", "p3"};
+    ClassDB::bind_method(pushTriOperation, &GDExample::pushTriangle);
 
     auto setStartingMeshOp = D_METHOD("set_starting_mesh");
     setStartingMeshOp.args = {"verts", "tris"};

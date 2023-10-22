@@ -52,6 +52,7 @@ func _input(event: InputEvent) -> void:
 
 func _ready():
 	regen_mesh(voxel_size)
+	push_triangle(Vector3(.5,.5,.5), Vector3(-.5,-.5,-.5), Vector3(.1,-.1,-.5))
 	open_file_dialog.show()
 	open_file_dialog.connect("file_selected", 
 		func(path: String): 
@@ -61,18 +62,10 @@ func _ready():
 			var verts := gltf_state.meshes[0].mesh.get_surface_arrays(Mesh.ARRAY_VERTEX)
 			var tris := gltf_state.meshes[0].mesh.get_surface_arrays(Mesh.ARRAY_INDEX)
 
-			for i in range(0, verts[0].size()):
-				push_operation(
-					verts[0][i],
-					Quaternion.IDENTITY,
-					Vector3.ONE,
-					OPERATION_TYPE.ADD,
-					OPERATION_SHAPE.SPHERE,
-					0.1,
-					0.1,
-				)
+			for i in range(0, verts[0].size() - 2):
+				push_triangle(verts[0][i], verts[0][i + 1], verts[0][i + 2])
+				i += 2
 	)
-
 
 func _process(delta: float) -> void:
 	var mouse_pos := get_viewport().get_mouse_position()
