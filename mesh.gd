@@ -130,7 +130,7 @@ func _process(delta: float) -> void:
 			shape = OPERATION_SHAPE.CUBE
 	
 	var brush_rotation := Quaternion.IDENTITY
-	if !open_file_dialog.visible and is_add_held != is_subtract_held:
+	if !open_file_dialog.visible and is_add_held != is_subtract_held and !Input.is_action_pressed("rotate"):
 		if last_held_brush_pos == null or brush_pos.distance_squared_to(last_held_brush_pos) > (0.0001 * camera.position.z):
 			push_operation(
 				brush_pos, 

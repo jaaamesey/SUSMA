@@ -85,27 +85,11 @@ void GDExample::regenMesh(double voxelSize)
         {
             grid.reset();
         }
-        grid = openvdb::DoubleGrid::create();
+        // Use 1.0 as a background value (i.e. value of an empty SDF)
+        grid = openvdb::DoubleGrid::create(1.0);
         grid->setTransform(openvdb::math::Transform::createLinearTransform(voxelSize));
         grid->setGridClass(openvdb::GRID_LEVEL_SET);
         grid->setName("result");
-
-        openvdb::CoordBBox bbox(openvdb::Coord(-10.0 / voxelSize), openvdb::Coord(10.0 / voxelSize));
-        auto accessor = grid->getAccessor();
-        // for (auto iter = bbox.begin(); iter != bbox.end(); ++iter) {
-        //     openvdb::Vec3d worldCoord = grid->indexToWorld(*iter);
-        //     accessor.setValueOn(*iter, sdf);
-        // }
-
-        // // Insert initial sphere
-        // openvdb::CoordBBox bbox(openvdb::Coord(-10.0 / voxelSize), openvdb::Coord(10.0 / voxelSize));
-        // auto accessor = grid->getAccessor();
-        // for (auto iter = bbox.begin(); iter != bbox.end(); ++iter)
-        // {
-        //     openvdb::Vec3d worldCoord = grid->indexToWorld(*iter);
-        //     auto sdf = sphereSDF(worldCoord, 0.9);
-        //     accessor.setValueOn(*iter, sdf);
-        // }
     }
 
     bool canSkipRemesh = !shouldBuildGridFromScratch && pendingOperations.empty();
