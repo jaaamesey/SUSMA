@@ -14,6 +14,7 @@ extends GDExample
 @export var xr_right: XRController3D
 
 @export var open_file_dialog: FileDialog
+@export var save_file_dialog: FileDialog
 
 var voxel_size := 0.1
 
@@ -31,6 +32,11 @@ var last_held_brush_pos = null # Vector3 | null
 
 
 func _input(event: InputEvent) -> void:
+	if Input.is_action_just_pressed("save_file"):
+		save_file_dialog.show()
+	if Input.is_action_just_pressed("open_file"):
+		open_file_dialog.show()
+		
 	if Input.is_action_just_pressed("ui_right"):
 		brush_type = brush_types[(brush_types.find(brush_type) + 1) % brush_types.size()]
 	if Input.is_action_just_pressed("ui_left"):
@@ -52,7 +58,6 @@ func _input(event: InputEvent) -> void:
 
 func _ready():
 	regen_mesh(voxel_size)
-	open_file_dialog.show()
 	open_file_dialog.connect("file_selected", 
 		func(path: String): 
 			var gltf_doc := GLTFDocument.new()
@@ -72,7 +77,14 @@ func _ready():
 					0.1,
 				)
 	)
-
+	save_file_dialog.connect("file_selected", 
+		func(path: String):
+			var gltf_doc := GLTFDocument.new()
+			var gltf_state := GLTFState.new()
+			gltf_doc.append_from_scene(self, gltf_state)
+			gltf_doc.write_to_filesystem(gltf_state, path)
+	)
+	open_file_dialog.show()
 
 func _process(delta: float) -> void:
 	var mouse_pos := get_viewport().get_mouse_position()

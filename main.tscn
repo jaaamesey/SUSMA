@@ -231,7 +231,7 @@ material = ExtResource("4_kdbe2")
 size = Vector3(2, 2, 2)
 material = ExtResource("4_kdbe2")
 
-[node name="GDExample" type="GDExample" parent="." node_paths=PackedStringArray("crosshair_node", "world_crosshair_node", "cursor_node", "cursor_depth_indicator_node", "brush_size_label_node", "z_label_node", "sculpt_info_label_node", "xr_sculpt_info_node", "xr_camera", "xr_left", "xr_right", "open_file_dialog")]
+[node name="GDExample" type="GDExample" parent="." node_paths=PackedStringArray("crosshair_node", "world_crosshair_node", "cursor_node", "cursor_depth_indicator_node", "brush_size_label_node", "z_label_node", "sculpt_info_label_node", "xr_sculpt_info_node", "xr_camera", "xr_left", "xr_right", "open_file_dialog", "save_file_dialog")]
 material_override = SubResource("StandardMaterial3D_nnuj1")
 script = ExtResource("3_0hjvr")
 crosshair_node = NodePath("../CameraOrbitPoint/XRotator/Camera3D/Crosshair")
@@ -245,7 +245,8 @@ xr_sculpt_info_node = NodePath("../CameraOrbitPoint/XRotator/Camera3D/XROrigin3D
 xr_camera = NodePath("../CameraOrbitPoint/XRotator/Camera3D/XROrigin3D/XRCamera3D")
 xr_left = NodePath("../CameraOrbitPoint/XRotator/Camera3D/XROrigin3D/LeftController")
 xr_right = NodePath("../CameraOrbitPoint/XRotator/Camera3D/XROrigin3D/RightController")
-open_file_dialog = NodePath("../CanvasLayer/Control/FileDialog")
+open_file_dialog = NodePath("../CanvasLayer/Control/OpenMeshFileDialog")
+save_file_dialog = NodePath("../CanvasLayer/Control/SaveMeshFileDialog")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 layer = -2
@@ -260,12 +261,18 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="FileDialog" type="FileDialog" parent="CanvasLayer/Control"]
+[node name="OpenMeshFileDialog" type="FileDialog" parent="CanvasLayer/Control"]
 title = "Open a File"
-position = Vector2i(0, 36)
-size = Vector2i(327, 168)
+position = Vector2i(70, 36)
+size = Vector2i(1007, 578)
 ok_button_text = "Open"
 file_mode = 0
+access = 2
+
+[node name="SaveMeshFileDialog" type="FileDialog" parent="CanvasLayer/Control"]
+position = Vector2i(70, 36)
+size = Vector2i(1007, 578)
+ok_button_text = "Save"
 access = 2
 
 [node name="SculptInfo" type="RichTextLabel" parent="CanvasLayer/Control"]
@@ -279,3 +286,8 @@ theme_override_fonts/bold_font = ExtResource("5_s1qx0")
 text = "test"
 fit_content = true
 scroll_active = false
+
+[node name="Control" type="Control" parent="CanvasLayer/Control"]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
