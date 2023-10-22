@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://mesh.gd" id="3_0hjvr"]
 [ext_resource type="FontFile" uid="uid://dfdlqxx1ybvwp" path="res://fnt/SpaceMono-Regular.ttf" id="3_mmugm"]
 [ext_resource type="Environment" uid="uid://chawjnfe6rdua" path="res://env.tres" id="3_ttvdp"]
+[ext_resource type="Material" uid="uid://cq7n7tjfp0kmi" path="res://cursor_material.tres" id="4_kdbe2"]
 [ext_resource type="FontFile" uid="uid://c6c083fv8f8d2" path="res://fnt/SpaceMono-Bold.ttf" id="5_s1qx0"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uwpub"]
@@ -50,12 +51,6 @@ fixed_size = true
 transparency = 1
 shading_mode = 0
 albedo_color = Color(1, 1, 1, 0.298039)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8ppdb"]
-transparency = 1
-cull_mode = 2
-shading_mode = 0
-albedo_color = Color(1, 1, 1, 0.0117647)
 
 [sub_resource type="Gradient" id="Gradient_i213h"]
 colors = PackedColorArray(1, 0, 0, 1, 1, 0.341176, 1, 1)
@@ -224,11 +219,17 @@ font = ExtResource("3_mmugm")
 outline_size = 0
 horizontal_alignment = 0
 
-[node name="Cursor" type="CSGSphere3D" parent="."]
+[node name="Cursor" type="Node3D" parent="."]
+
+[node name="sphere" type="CSGSphere3D" parent="Cursor"]
 radius = 1.0
 radial_segments = 20
 rings = 20
-material = SubResource("StandardMaterial3D_8ppdb")
+material = ExtResource("4_kdbe2")
+
+[node name="cube" type="CSGBox3D" parent="Cursor"]
+size = Vector3(2, 2, 2)
+material = ExtResource("4_kdbe2")
 
 [node name="GDExample" type="GDExample" parent="." node_paths=PackedStringArray("crosshair_node", "world_crosshair_node", "cursor_node", "cursor_depth_indicator_node", "brush_size_label_node", "z_label_node", "sculpt_info_label_node", "xr_sculpt_info_node", "xr_camera", "xr_left", "xr_right", "open_file_dialog")]
 material_override = SubResource("StandardMaterial3D_nnuj1")

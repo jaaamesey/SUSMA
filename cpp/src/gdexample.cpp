@@ -44,13 +44,8 @@ inline double sphereSDF(const openvdb::Vec3d &p, double radius)
 
 inline double cubeSDF(const openvdb::Vec3d &p, double halfWidth)
 {
-    openvdb::Vec3d halfSize = openvdb::Vec3d(halfWidth, halfWidth, halfWidth) * 0.5;
-    openvdb::Vec3d d = openvdb::Vec3d(std::abs(p.x()), std::abs(p.y()), std::abs(p.z())) - halfSize;
-    
-    double insideCube = fmin(fmax(d.x(), fmax(d.y(), d.z())), 0.0);
-    double outsideCube = (d - insideCube).length();
-    
-    return insideCube + outsideCube;
+    openvdb::Vec3d q = openvdb::Vec3d(std::abs(p.x()) - halfWidth, std::abs(p.y()) - halfWidth, std::abs(p.z()) - halfWidth);
+    return openvdb::Vec3d(std::max(q.x(), 0.0), std::max(q.y(), 0.0), std::max(q.z(), 0.0)).length() + std::min(std::max(q.x(), std::max(q.y(), q.z())), 0.0);
 }
 
 inline double distanceBetweenVectors(const openvdb::Vec3d &v1, const openvdb::Vec3d& v2) {
