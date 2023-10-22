@@ -126,6 +126,7 @@ func _process(delta: float) -> void:
 	var brush_rotation := Quaternion.from_euler(Vector3(20, 10, 0))
 	if get_viewport().use_xr:
 		brush_pos = xr_right.global_position - brush_distance * xr_right.get_global_transform().basis.z
+		brush_rotation = Quaternion.from_euler(xr_right.rotation)
 	crosshair_node.global_position = brush_pos
 	world_crosshair_node.global_position = brush_pos
 	cursor_node.global_position = brush_pos
