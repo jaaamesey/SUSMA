@@ -28,6 +28,7 @@ namespace godot
         {
             openvdb::Vec3d point;
             openvdb::Quatd rotation;
+            openvdb::Vec3d scale;
             OperationType type;
             OperationShape shape;
             double brushSize;
@@ -51,7 +52,7 @@ namespace godot
         void _ready();
         void _process(double delta);
         void regenMesh(double voxelSize);
-        void pushOperation(Vector3 pos, Quaternion rotation, int type, int shape, double brushSize, double brushBlend);
+        void pushOperation(Vector3 pos, Quaternion rotation, Vector3 scale, int type, int shape, double brushSize, double brushBlend);
         void tempSetStartingMesh(PackedVector3Array verts, PackedVector3Array tris);
     };
 

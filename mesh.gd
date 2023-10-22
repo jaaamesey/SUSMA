@@ -65,6 +65,7 @@ func _ready():
 				push_operation(
 					verts[0][i],
 					Quaternion.IDENTITY,
+					Vector3.ONE,
 					OPERATION_TYPE.ADD,
 					OPERATION_SHAPE.SPHERE,
 					0.1,
@@ -139,6 +140,7 @@ func _process(delta: float) -> void:
 			push_operation(
 				brush_pos, 
 				brush_rotation,
+				Vector3.ONE,
 				OPERATION_TYPE.ADD if is_add_held else OPERATION_TYPE.SUBTRACT, 
 				shape,
 				brush_size,
@@ -148,6 +150,7 @@ func _process(delta: float) -> void:
 				push_operation(
 					Vector3(-brush_pos.x, brush_pos.y, brush_pos.z), 
 					brush_rotation,
+					Vector3(-1, 1, 1),
 					OPERATION_TYPE.ADD if is_add_held else OPERATION_TYPE.SUBTRACT, 
 					shape,
 					brush_size,

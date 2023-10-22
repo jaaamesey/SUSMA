@@ -103,7 +103,7 @@ void GDExample::regenMesh(double voxelSize)
         {
             openvdb::Vec3d worldCoord = grid->indexToWorld(*iter);
             auto sdf = accessor.getValue(*iter);
-            auto point = operation.rotation.rotateVector(worldCoord - operation.point);
+            auto point = operation.scale * operation.rotation.rotateVector(worldCoord - operation.point);
             double shapeSdf;
             switch (operation.shape)
             {
@@ -174,11 +174,12 @@ void GDExample::regenMesh(double voxelSize)
     lastVoxelSize = voxelSize;
 }
 
-void GDExample::pushOperation(Vector3 brushPos, Quaternion brushRotation, int type, int shape, double brushSize, double brushBlend)
+void GDExample::pushOperation(Vector3 brushPos, Quaternion brushRotation, Vector3 brushScale, int type, int shape, double brushSize, double brushBlend)
 {
     struct Operation operation;
     operation.point = openvdb::Vec3d(brushPos.x, brushPos.y, brushPos.z);
     operation.rotation = openvdb::Quatd(brushRotation.x, brushRotation.y, brushRotation.z, brushRotation.w);
+    operation.scale = openvdb::Vec3d(brushScale.x, brushScale.y, brushScale.z);
     operation.type = (OperationType)type;
     operation.shape = (OperationShape)shape;
     operation.brushSize = brushSize;
@@ -220,7 +221,7 @@ void GDExample::_bind_methods()
     ClassDB::bind_integer_constant("GDExample", "OPERATION_SHAPE", "CUBE", OperationShape::CUBE);
 
     auto pushOperation = D_METHOD("push_operation");
-    pushOperation.args = {"pos", "rotation", "type", "shape", "brushSize", "brushBlend"};
+    pushOperation.args = {"pos", "rotation", "scale", "type", "shape", "brushSize", "brushBlend"};
     ClassDB::bind_method(pushOperation, &GDExample::pushOperation);
 
     auto setStartingMeshOp = D_METHOD("set_starting_mesh");
