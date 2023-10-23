@@ -1,11 +1,13 @@
-[gd_scene load_steps=17 format=3 uid="uid://buq74sffrev0c"]
+[gd_scene load_steps=19 format=3 uid="uid://buq74sffrev0c"]
 
 [ext_resource type="Script" path="res://src/camera_orbit_point.gd" id="2_1kh2o"]
+[ext_resource type="Texture2D" uid="uid://c6xf6lbvh2wmy" path="res://startup.png" id="2_wql44"]
 [ext_resource type="Script" path="res://mesh.gd" id="3_0hjvr"]
 [ext_resource type="FontFile" uid="uid://dfdlqxx1ybvwp" path="res://fnt/SpaceMono-Regular.ttf" id="3_mmugm"]
 [ext_resource type="Environment" uid="uid://chawjnfe6rdua" path="res://env.tres" id="3_ttvdp"]
 [ext_resource type="Material" uid="uid://cq7n7tjfp0kmi" path="res://cursor_material.tres" id="4_kdbe2"]
 [ext_resource type="FontFile" uid="uid://c6c083fv8f8d2" path="res://fnt/SpaceMono-Bold.ttf" id="5_s1qx0"]
+[ext_resource type="Script" path="res://startup_screen.gd" id="7_x6fog"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uwpub"]
 transparency = 1
@@ -312,3 +314,61 @@ scroll_active = false
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
+
+[node name="StartupScreenPanel" type="Panel" parent="CanvasLayer/Control" node_paths=PackedStringArray("help_suggestion_label")]
+process_mode = 3
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("7_x6fog")
+help_suggestion_label = NodePath("../HelpSuggestionLabel")
+
+[node name="StartupScreen" type="TextureRect" parent="CanvasLayer/Control/StartupScreenPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 23.0
+offset_bottom = -67.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_wql44")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Button" type="Button" parent="CanvasLayer/Control/StartupScreenPanel"]
+process_mode = 3
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -73.0
+offset_top = -53.0
+offset_right = 73.0
+offset_bottom = -21.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Continue"
+
+[node name="HelpSuggestionLabel" type="Label" parent="CanvasLayer/Control"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -245.0
+offset_top = -42.0
+offset_right = -19.0
+offset_bottom = -15.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "Press Ctrl + H for Help"
+
+[connection signal="pressed" from="CanvasLayer/Control/StartupScreenPanel/Button" to="CanvasLayer/Control/StartupScreenPanel" method="_on_button_pressed"]

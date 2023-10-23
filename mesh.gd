@@ -37,8 +37,6 @@ var last_raw_mouse_pos := Vector2()
 
 var can_fire_collision_pulse := true
 
-var xr_b_pressed := false
-
 
 func _input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed("save_file"):
@@ -46,7 +44,7 @@ func _input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed("open_file"):
 		open_file_dialog.show()
 		
-	if Input.is_action_just_pressed("ui_right"):
+	if Input.is_action_just_pressed("ui_right") or Input.is_action_just_pressed("cycle_brushes"):
 		brush_type = brush_types[(brush_types.find(brush_type) + 1) % brush_types.size()]
 	
 	if Input.is_action_just_pressed("ui_left"):
@@ -243,7 +241,7 @@ func _process(delta: float) -> void:
 	
 	var sculpt_info = xr_sculpt_info_node if get_viewport().use_xr else sculpt_info_label_node
 	sculpt_info.text += "FPS: %s\n" % Engine.get_frames_per_second()
-	sculpt_info.text += "Voxel size: %s\n" % voxel_size
+	sculpt_info.text += "Voxels per unit: %3.1f\n" % (1.0 / voxel_size)
 	sculpt_info.text += "Vertices: %s\n" % mesh.get_faces().size() if mesh != null else 0
 	sculpt_info.text += "Brush type: %s\n" % brush_type
 	sculpt_info.text += "Brush size: %3.3f\n" % brush_size
