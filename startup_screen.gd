@@ -12,7 +12,7 @@ func _process(delta):
 	if Input.is_action_just_pressed("help"):
 		visible = !visible
 		help_suggestion_label.visible = false
-	if Input.is_key_pressed(KEY_ESCAPE):
+	if Input.is_key_pressed(KEY_ESCAPE) or Input.is_key_pressed(KEY_ENTER) or Input.is_key_pressed(KEY_SPACE):
 		visible = false
 	
 	if get_viewport().use_xr:

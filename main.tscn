@@ -320,6 +320,7 @@ offset_bottom = 40.0
 
 [node name="StartupScreenPanel" type="Panel" parent="CanvasLayer/Control" node_paths=PackedStringArray("help_suggestion_label")]
 process_mode = 3
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -351,10 +352,10 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -73.0
-offset_top = -53.0
-offset_right = 73.0
-offset_bottom = -21.0
+offset_left = -86.0
+offset_top = -79.0
+offset_right = 86.0
+offset_bottom = -30.0
 grow_horizontal = 2
 grow_vertical = 0
 text = "Continue"
@@ -366,12 +367,14 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -245.0
-offset_top = -42.0
-offset_right = -19.0
-offset_bottom = -15.0
+offset_left = -233.0
+offset_top = -28.0
+offset_right = -7.0
+offset_bottom = -1.0
 grow_horizontal = 0
 grow_vertical = 0
-text = "Press Ctrl + H for Help"
+theme_override_font_sizes/font_size = 12
+text = "Press Ctrl + H for Help."
+horizontal_alignment = 2
 
 [connection signal="pressed" from="CanvasLayer/Control/StartupScreenPanel/Button" to="CanvasLayer/Control/StartupScreenPanel" method="_on_button_pressed"]
