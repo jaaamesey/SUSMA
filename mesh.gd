@@ -188,9 +188,11 @@ func _process(delta: float) -> void:
 				brush_blend * brush_size,
 			)
 			if x_symmetry:
+				var euler_rotation := -brush_rotation.get_euler()
+				euler_rotation.y *= -1
 				push_operation(
 					Vector3(-brush_pos.x, brush_pos.y, brush_pos.z), 
-					brush_rotation,
+					Quaternion(brush_rotation.x, -brush_rotation.y, -brush_rotation.z, brush_rotation.w),
 					Vector3.ONE if brush_type == "grab" else Vector3(-1, 1, 1),
 					Vector3(-direction.x, direction.y, direction.z),
 					op_type, 

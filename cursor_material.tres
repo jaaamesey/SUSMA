@@ -3,5 +3,7 @@
 [resource]
 transparency = 1
 cull_mode = 2
-shading_mode = 0
 albedo_color = Color(1, 1, 1, 0.0117647)
+emission_enabled = true
+emission = Color(1, 1, 1, 1)
+backlight = Color(1, 1, 1, 1)
