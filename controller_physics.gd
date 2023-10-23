@@ -6,7 +6,6 @@ extends RigidBody3D
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	connect("body_entered", func(body: Node):
-		print("ENTER")
 		controller.trigger_haptic_pulse("haptic", 0.1, 0.15, 0.1, 0)	
 	)
 

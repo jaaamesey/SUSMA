@@ -112,6 +112,7 @@ bg_color = Color(1, 1, 1, 0.941176)
 [node name="MarbleTemplate" type="RigidBody3D" parent="Marbles"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1e+07, -999999, -99999)
 physics_material_override = SubResource("PhysicsMaterial_3u2m1")
+continuous_cd = true
 sleeping = true
 freeze = true
 script = ExtResource("1_xeddq")
