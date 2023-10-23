@@ -35,7 +35,9 @@ var last_raw_brush_pos := Vector3()
 var last_mouse_pos := Vector2()
 var last_raw_mouse_pos := Vector2()
 
+var can_fire_collision_pulse := true
 
+var xr_b_pressed := false
 
 
 func _input(event: InputEvent) -> void:
@@ -46,6 +48,7 @@ func _input(event: InputEvent) -> void:
 		
 	if Input.is_action_just_pressed("ui_right"):
 		brush_type = brush_types[(brush_types.find(brush_type) + 1) % brush_types.size()]
+	
 	if Input.is_action_just_pressed("ui_left"):
 		brush_type = brush_types[(brush_types.find(brush_type) - 1) % brush_types.size()]
 			
@@ -91,6 +94,10 @@ func _ready():
 			var gltf_state := GLTFState.new()
 			gltf_doc.append_from_scene(self, gltf_state)
 			gltf_doc.write_to_filesystem(gltf_state, path)
+	)
+	xr_right.connect("button_pressed", func(name: String):
+		if name == "by_button":
+			brush_type = brush_types[(brush_types.find(brush_type) + 1) % brush_types.size()]
 	)
 
 
@@ -174,11 +181,27 @@ func _process(delta: float) -> void:
 		"grab":
 			op_type = OPERATION_TYPE.DRAG
 			shape = OPERATION_SHAPE.SPHERE
+	
+	if get_viewport().use_xr:
+		var haptic_intensity := 0.2
+		var sd := get_grid_val(brush_pos)
 
+		if sd < 0.01 and sd < 0:
+			if can_fire_collision_pulse:
+				xr_right.trigger_haptic_pulse("haptic", 0.1, haptic_intensity, 0.1, 0)
+				can_fire_collision_pulse = false
+		else:
+			if can_fire_collision_pulse == false:
+				xr_right.trigger_haptic_pulse("haptic", 0.1, haptic_intensity, 0.05, 0)
+				can_fire_collision_pulse = true
+	
 	if !open_file_dialog.visible and is_add_held != is_subtract_held and !Input.is_action_pressed("rotate"):
 		var direction := 0.001 * (last_raw_brush_pos - brush_pos) / brush_size
 
 		if last_held_brush_pos == null or brush_pos.distance_squared_to(last_held_brush_pos) > (0.0001 * camera.position.z):
+			if get_viewport().use_xr:
+				var haptic_intensity := 0.1
+				xr_right.trigger_haptic_pulse("haptic", 0.1, haptic_intensity, delta, 0)
 			push_operation(
 				brush_pos, 
 				brush_rotation,

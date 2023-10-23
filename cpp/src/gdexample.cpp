@@ -221,6 +221,13 @@ void GDExample::pushOperation(Vector3 brushPos, Quaternion brushRotation, Vector
     pendingOperations.push_back(operation);
 }
 
+double GDExample::getGridVal(Vector3 pos)
+{
+    auto accessor = grid->getAccessor();
+    auto indexVec = grid->worldToIndex(openvdb::Vec3d(pos.x, pos.y, pos.z));
+    return accessor.getValue(openvdb::Coord(indexVec.x(), indexVec.y(), indexVec.z()));
+}
+
 void GDExample::tempSetStartingMesh(PackedVector3Array verts, PackedVector3Array tris)
 {
     for (auto vert : verts)
@@ -264,6 +271,8 @@ void GDExample::_bind_methods()
     auto setStartingMeshOp = D_METHOD("set_starting_mesh");
     setStartingMeshOp.args = {"verts", "tris"};
     ClassDB::bind_method(setStartingMeshOp, &GDExample::tempSetStartingMesh);
+    
+    ClassDB::bind_method(D_METHOD("get_grid_val", "pos"), &GDExample::getGridVal);
 
     ClassDB::bind_method(D_METHOD("regen_mesh", "voxel_size"), &GDExample::regenMesh);
 }

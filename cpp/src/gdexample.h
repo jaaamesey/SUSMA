@@ -56,6 +56,7 @@ namespace godot
         void _process(double delta);
         void regenMesh(double voxelSize);
         void pushOperation(Vector3 pos, Quaternion rotation, Vector3 scale, Vector3 direction, int type, int shape, double brushSize, double brushBlend);
+        double getGridVal(Vector3 pos);
         void tempSetStartingMesh(PackedVector3Array verts, PackedVector3Array tris);
     };
 
