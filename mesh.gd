@@ -22,6 +22,8 @@ var brush_size := 0.1
 var brush_distance := 0.8
 var brush_blend := 0.15
 
+var brush_rotation := Quaternion.IDENTITY
+
 var brush_types := ["sphere", "cube", "grab"]
 var brush_type := "sphere"
 
@@ -30,6 +32,10 @@ var x_symmetry := true
 
 var last_held_brush_pos = null # Vector3 | null
 var last_raw_brush_pos := Vector3()
+var last_mouse_pos := Vector2()
+var last_raw_mouse_pos := Vector2()
+
+
 
 
 func _input(event: InputEvent) -> void:
@@ -124,13 +130,25 @@ func _process(delta: float) -> void:
 	else:
 		brush_distance += brush_distance_spd * xr_right.get_vector2("primary").y
 		
+	if Input.is_action_pressed("rotate_brush"):
+		Input.mouse_mode = Input.MOUSE_MODE_CONFINED_HIDDEN
+		var mouse_dir := 0.01 * (last_raw_mouse_pos - get_viewport().get_mouse_position())
+		brush_rotation = brush_rotation * Quaternion(Vector3.UP, mouse_dir.x) * Quaternion(Vector3.RIGHT, mouse_dir.y) 
+		mouse_pos = last_mouse_pos
+	elif Input.is_action_just_released("rotate_brush"):
+		get_viewport().warp_mouse(last_mouse_pos)
+		mouse_pos = last_mouse_pos
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	
 	var brush_pos := camera.project_position(mouse_pos, -brush_distance + camera.position.z)
-	var brush_rotation := Quaternion.from_euler(Vector3(20, 10, 0))
+
 	if get_viewport().use_xr:
 		brush_pos = xr_right.global_position - brush_distance * xr_right.get_global_transform().basis.z
 		brush_rotation = Quaternion.from_euler(xr_right.rotation)
 	if brush_type == "grab":
 		brush_rotation = Quaternion.IDENTITY
+
+		
 	crosshair_node.global_position = brush_pos
 	world_crosshair_node.global_position = brush_pos
 	cursor_node.global_position = brush_pos
@@ -162,7 +180,7 @@ func _process(delta: float) -> void:
 			push_operation(
 				brush_pos, 
 				brush_rotation,
-				Vector3.ONE,
+				Vector3(1, 1, 1),
 				direction,
 				op_type,
 				shape,
@@ -185,6 +203,8 @@ func _process(delta: float) -> void:
 		last_held_brush_pos = null
 		
 	last_raw_brush_pos = brush_pos
+	last_mouse_pos = mouse_pos
+	last_raw_mouse_pos = get_viewport().get_mouse_position()
 		
 	regen_mesh(voxel_size)
 	
