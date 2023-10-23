@@ -23,6 +23,7 @@ namespace godot
         {
             SPHERE,
             CUBE,
+            SOLID_ANGLE,
         };
 
         struct Operation

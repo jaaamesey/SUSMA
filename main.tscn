@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://buq74sffrev0c"]
+[gd_scene load_steps=17 format=3 uid="uid://buq74sffrev0c"]
 
 [ext_resource type="Script" path="res://src/camera_orbit_point.gd" id="2_1kh2o"]
 [ext_resource type="Script" path="res://mesh.gd" id="3_0hjvr"]
@@ -51,6 +51,12 @@ fixed_size = true
 transparency = 1
 shading_mode = 0
 albedo_color = Color(1, 1, 1, 0.298039)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bry4j"]
+transparency = 1
+cull_mode = 2
+shading_mode = 0
+albedo_color = Color(1, 0.866667, 0, 0.0196078)
 
 [sub_resource type="Gradient" id="Gradient_i213h"]
 colors = PackedColorArray(1, 0, 0, 1, 1, 0.341176, 1, 1)
@@ -231,10 +237,19 @@ material = ExtResource("4_kdbe2")
 radius = 1.0
 radial_segments = 20
 rings = 20
-material = ExtResource("4_kdbe2")
+material = SubResource("StandardMaterial3D_bry4j")
 
 [node name="cube" type="CSGBox3D" parent="Cursor"]
 size = Vector3(2, 2, 2)
+material = ExtResource("4_kdbe2")
+
+[node name="angle" type="CSGPolygon3D" parent="Cursor"]
+transform = Transform3D(-0.314563, 4.83938e-08, 0, -2.75e-08, -0.553561, 0, 0, 0, 0.315778, 0, 0.565487, 0)
+polygon = PackedVector2Array(0, 0, -0.0278223, 0.97717, 1.06623, -0.628277, 1.13568, -0.731982, 1.07664, -0.878774)
+mode = 1
+spin_degrees = 360.0
+spin_sides = 18
+smooth_faces = true
 material = ExtResource("4_kdbe2")
 
 [node name="GDExample" type="GDExample" parent="." node_paths=PackedStringArray("crosshair_node", "world_crosshair_node", "cursor_node", "cursor_depth_indicator_node", "brush_size_label_node", "z_label_node", "sculpt_info_label_node", "xr_sculpt_info_node", "xr_camera", "xr_left", "xr_right", "open_file_dialog", "save_file_dialog")]

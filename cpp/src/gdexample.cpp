@@ -25,6 +25,13 @@ inline double lerp(double start, double end, double t)
     return start + t * (end - start);
 }
 
+inline int sign(double val)
+{
+    if (val == 0.0)
+        return 0;
+    return val > 0 ? 1 : -1;
+}
+
 inline double opSmoothUnionSDF(double a, double b, double k)
 {
     double h = std::clamp(0.5 + 0.5 * (a - b) / k, 0.0, 1.0);
@@ -42,24 +49,35 @@ inline double sphereSDF(const openvdb::Vec3d &p, double radius)
     return p.length() - radius;
 }
 
+inline double solidAngleSDF(const openvdb::Vec3d &p, double radius)
+{
+    auto angleRad = .35; 
+    auto c = openvdb::Vec2d(std::sin(angleRad), std::cos(angleRad));
+    auto q = openvdb::Vec2d(openvdb::Vec2d(p.x(), p.z()).length(), p.y());
+    auto l = q.length() - radius;
+    auto m = (q - c * std::clamp(q.dot(c), 0.0, radius)).length();
+    return std::max(l, m * sign(c.y() * q.x() - c.x() * q.y()));
+}
+
 inline double cubeSDF(const openvdb::Vec3d &p, double halfWidth)
 {
     openvdb::Vec3d q = openvdb::Vec3d(std::abs(p.x()) - halfWidth, std::abs(p.y()) - halfWidth, std::abs(p.z()) - halfWidth);
     return openvdb::Vec3d(std::max(q.x(), 0.0), std::max(q.y(), 0.0), std::max(q.z(), 0.0)).length() + std::min(std::max(q.x(), std::max(q.y(), q.z())), 0.0);
 }
 
-inline double distanceBetweenVectors(const openvdb::Vec3d &v1, const openvdb::Vec3d& v2) {
+inline double distanceBetweenVectors(const openvdb::Vec3d &v1, const openvdb::Vec3d &v2)
+{
     double dx = v1.x() - v2.x();
     double dy = v1.y() - v2.y();
     double dz = v1.z() - v2.z();
     return std::sqrt(dx * dx + dy * dy + dz * dz);
 }
 
-inline double signedDistanceBetweenVectors(const openvdb::Vec3d &v1, const openvdb::Vec3d& v2) {
+inline double signedDistanceBetweenVectors(const openvdb::Vec3d &v1, const openvdb::Vec3d &v2)
+{
     auto sign = v1.dot(v2) < 0 ? -1 : 1;
     return sign * distanceBetweenVectors(v1, v2);
 }
-
 
 inline openvdb::CoordBBox sphereBBox(const openvdb::Vec3d &p, double radius, double voxelSize)
 {
@@ -115,6 +133,9 @@ void GDExample::regenMesh(double voxelSize)
             case OperationShape::CUBE:
                 shapeSdf = cubeSDF(point, operation.brushSize);
                 break;
+            case OperationShape::SOLID_ANGLE:
+                shapeSdf = solidAngleSDF(point, operation.brushSize);
+                break;
             default:
                 throw std::exception("Invalid shape");
             }
@@ -126,7 +147,8 @@ void GDExample::regenMesh(double voxelSize)
             case OperationType::SUBTRACT:
                 sdf = opSmoothSubtractionSDF(sdf, shapeSdf, operation.brushBlend);
                 break;
-            case OperationType::DRAG: {
+            case OperationType::DRAG:
+            {
                 auto influenceAmount = std::max(0.0, -sphereSDF(point, operation.brushSize));
                 auto transformedCoord = worldCoord + influenceAmount * operation.direction;
                 auto indexCoord = grid->worldToIndex(transformedCoord);
@@ -201,10 +223,12 @@ void GDExample::pushOperation(Vector3 brushPos, Quaternion brushRotation, Vector
 
 void GDExample::tempSetStartingMesh(PackedVector3Array verts, PackedVector3Array tris)
 {
-    for (auto vert : verts) {
+    for (auto vert : verts)
+    {
         tempStartingMeshVerts->push_back(openvdb::Vec3s(vert.x, vert.y, vert.z));
     }
-    for (auto tri : tris) {
+    for (auto tri : tris)
+    {
         tempStartingMeshTris->push_back(openvdb::Vec3I(tri.x, tri.y, tri.z));
     }
 }
@@ -231,6 +255,7 @@ void GDExample::_bind_methods()
 
     ClassDB::bind_integer_constant("GDExample", "OPERATION_SHAPE", "SPHERE", OperationShape::SPHERE);
     ClassDB::bind_integer_constant("GDExample", "OPERATION_SHAPE", "CUBE", OperationShape::CUBE);
+    ClassDB::bind_integer_constant("GDExample", "OPERATION_SHAPE", "SOLID_ANGLE", OperationShape::SOLID_ANGLE);
 
     auto pushOperation = D_METHOD("push_operation");
     pushOperation.args = {"pos", "rotation", "scale", "direction", "type", "shape", "brushSize", "brushBlend"};

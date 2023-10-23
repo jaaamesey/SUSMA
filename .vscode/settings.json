@@ -106,6 +106,7 @@
     "semaphore": "cpp",
     "syncstream": "cpp",
     "valarray": "cpp",
-    "*.ipp": "cpp"
+    "*.ipp": "cpp",
+    "resumable": "cpp"
   }
 }
