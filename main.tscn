@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://buq74sffrev0c"]
+[gd_scene load_steps=20 format=3 uid="uid://buq74sffrev0c"]
 
 [ext_resource type="Script" path="res://src/camera_orbit_point.gd" id="2_1kh2o"]
 [ext_resource type="Texture2D" uid="uid://c6xf6lbvh2wmy" path="res://startup.png" id="2_wql44"]
@@ -83,6 +83,9 @@ subsurf_scatter_transmittance_enabled = true
 subsurf_scatter_transmittance_depth = 2.909
 subsurf_scatter_transmittance_boost = 0.46
 backlight = Color(0.666667, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vmqlj"]
+bg_color = Color(1, 1, 1, 0.941176)
 
 [node name="main" type="Node3D"]
 
@@ -317,13 +320,13 @@ offset_bottom = 40.0
 
 [node name="StartupScreenPanel" type="Panel" parent="CanvasLayer/Control" node_paths=PackedStringArray("help_suggestion_label")]
 process_mode = 3
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_vmqlj")
 script = ExtResource("7_x6fog")
 help_suggestion_label = NodePath("../HelpSuggestionLabel")
 
