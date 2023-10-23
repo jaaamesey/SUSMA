@@ -20,6 +20,9 @@ func _process(delta):
 		help_suggestion_label.visible = false
 	
 	get_tree().paused = visible
+	
+	if visible:
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 func _on_button_pressed():
 	visible = false
