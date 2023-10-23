@@ -16,6 +16,10 @@ extends GDExample
 @export var open_file_dialog: FileDialog
 @export var save_file_dialog: FileDialog
 
+@export var collision_shape: CollisionShape3D
+@export var inner_collision_shape: CollisionShape3D
+@export var marble_template: RigidBody3D
+
 var voxel_size := 0.1
 
 var brush_size := 0.1
@@ -35,8 +39,12 @@ var last_raw_brush_pos := Vector3()
 var last_mouse_pos := Vector2()
 var last_raw_mouse_pos := Vector2()
 
+var last_mesh_id := -1
+
 var can_fire_collision_pulse := true
 
+var marbles_created := false
+var marbles_created_changed := false
 
 func _input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed("save_file"):
@@ -96,6 +104,10 @@ func _ready():
 	xr_right.connect("button_pressed", func(name: String):
 		if name == "by_button":
 			brush_type = brush_types[(brush_types.find(brush_type) + 1) % brush_types.size()]
+		elif name == "ax_button":
+			add_marble(last_raw_brush_pos)
+		elif name == "primary_click":
+			x_symmetry = !x_symmetry
 	)
 
 
@@ -193,6 +205,9 @@ func _process(delta: float) -> void:
 				xr_right.trigger_haptic_pulse("haptic", 0.1, haptic_intensity, 0.05, 0)
 				can_fire_collision_pulse = true
 	
+	if Input.is_action_just_pressed("add_marble"):
+		add_marble(brush_pos)
+		
 	if !open_file_dialog.visible and is_add_held != is_subtract_held and !Input.is_action_pressed("rotate"):
 		var direction := 0.001 * (last_raw_brush_pos - brush_pos) / brush_size
 
@@ -232,6 +247,17 @@ func _process(delta: float) -> void:
 	last_raw_mouse_pos = get_viewport().get_mouse_position()
 		
 	regen_mesh(voxel_size)
+	var mesh_id := mesh.get_rid().get_id()
+
+	if marbles_created and (mesh_id != last_mesh_id or marbles_created_changed):
+		collision_shape.shape = mesh.create_trimesh_shape()
+		if marbles_created:
+			var inner := mesh.create_outline(-0.01)
+			if inner:
+				inner_collision_shape.shape = inner.create_trimesh_shape()
+
+	last_mesh_id = mesh_id
+	marbles_created_changed = false
 	
 	brush_size_label_node.text = str(brush_size).pad_decimals(2)
 	z_label_node.text = str(brush_distance).pad_decimals(2)
@@ -249,3 +275,14 @@ func _process(delta: float) -> void:
 	sculpt_info.text += "Brush blend factor: %3.3f\n" % brush_blend
 	sculpt_info.text += "Brush symmetry (X): %s\n" % x_symmetry
 	sculpt_info.text = sculpt_info.text.to_upper()
+
+func add_marble(pos: Vector3):
+	var new_marble: RigidBody3D = marble_template.duplicate()
+	new_marble.global_position = pos
+	new_marble.freeze = false
+	new_marble.sleeping = false
+	marble_template.get_parent().add_child(new_marble)
+	if !marbles_created:
+		marbles_created = true
+		marbles_created_changed = true
+
