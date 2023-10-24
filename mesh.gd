@@ -172,7 +172,7 @@ func _process(delta: float) -> void:
 	cursor_node.global_rotation = brush_rotation.inverse().get_euler()
 	cursor_node.scale = brush_size * Vector3.ONE
 	for cursor in cursor_node.get_children():
-		cursor.visible = cursor.name == brush_type
+		cursor.visible = cursor.name == "KEEP" or cursor.name == brush_type
 	cursor_depth_indicator_node.global_position = brush_pos
 	cursor_depth_indicator_node.global_rotation = camera.global_rotation
 

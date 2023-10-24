@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://buq74sffrev0c"]
+[gd_scene load_steps=28 format=3 uid="uid://buq74sffrev0c"]
 
 [ext_resource type="Script" path="res://Marble.gd" id="1_xeddq"]
 [ext_resource type="Script" path="res://src/camera_orbit_point.gd" id="2_1kh2o"]
@@ -76,6 +76,11 @@ cull_mode = 2
 shading_mode = 0
 albedo_color = Color(1, 0.866667, 0, 0.0196078)
 
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_8hmqs"]
+width = 1647
+height = 1352
+invert = true
+
 [sub_resource type="Gradient" id="Gradient_i213h"]
 colors = PackedColorArray(1, 0, 0, 1, 1, 0.341176, 1, 1)
 
@@ -85,14 +90,19 @@ gradient = SubResource("Gradient_i213h")
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nnuj1"]
 cull_mode = 2
 albedo_color = Color(0.870588, 0.411765, 0.262745, 1)
-roughness = 0.15
+metallic_specular = 0.83
+roughness = 0.16
 emission = Color(0.537255, 0.231373, 0.2, 1)
 emission_energy_multiplier = 7.15
 normal_scale = 1.8
-rim_tint = 0.28
-clearcoat_roughness = 0.64
+normal_texture = SubResource("NoiseTexture2D_8hmqs")
+rim_enabled = true
+rim = 0.03
+rim_tint = 0.45
+clearcoat = 0.22
+clearcoat_roughness = 0.18
 anisotropy = -0.4
-subsurf_scatter_strength = 0.8
+subsurf_scatter_strength = 0.04
 subsurf_scatter_skin_mode = true
 subsurf_scatter_texture = SubResource("GradientTexture1D_ubmpy")
 subsurf_scatter_transmittance_enabled = true
@@ -185,13 +195,18 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.0748665)
 shape = SubResource("BoxShape3D_vp7cg")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="CameraOrbitPoint/XRotator/Camera3D"]
-transform = Transform3D(0.266046, -0.961922, 0.0626578, -0.549655, -0.0979821, 0.829625, -0.791895, -0.255159, -0.554793, -0.318733, 0.857194, -5.86869)
-light_energy = 0.667
+transform = Transform3D(-0.215718, -0.899944, -0.378901, -0.746425, -0.0981947, 0.658185, -0.629536, 0.424803, -0.650559, -0.318733, 0.857194, -5.86869)
+light_color = Color(0.901961, 1, 1, 1)
+light_energy = 2.202
+shadow_enabled = true
+shadow_opacity = 0.65
+shadow_blur = 1.71
 sky_mode = 1
 
 [node name="DirectionalLight3D2" type="DirectionalLight3D" parent="CameraOrbitPoint/XRotator/Camera3D"]
-transform = Transform3D(1, 0, 0, 0, 0.978111, -0.208082, 0, 0.208082, 0.978111, -0.918574, 0.749479, 1.67049)
-light_energy = 0.025
+transform = Transform3D(0.982656, 0.0890788, -0.162639, 0.0206543, 0.819029, 0.573381, 0.184282, -0.566795, 0.802984, 2.10868, 0.749479, 1.67049)
+light_color = Color(0.564706, 0.694118, 0.709804, 1)
+light_energy = 0.015
 sky_mode = 1
 
 [node name="Crosshair" type="Node3D" parent="CameraOrbitPoint/XRotator/Camera3D"]
@@ -291,6 +306,12 @@ outline_size = 0
 horizontal_alignment = 0
 
 [node name="Cursor" type="Node3D" parent="."]
+
+[node name="KEEP" type="Node3D" parent="Cursor"]
+
+[node name="OmniLight3D" type="OmniLight3D" parent="Cursor/KEEP"]
+light_energy = 0.15
+omni_range = 0.614931
 
 [node name="sphere" type="CSGSphere3D" parent="Cursor"]
 radius = 1.0
