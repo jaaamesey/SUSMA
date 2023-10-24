@@ -46,7 +46,7 @@ transparency = 1
 blend_mode = 1
 depth_draw_mode = 1
 shading_mode = 0
-albedo_color = Color(0, 1, 0, 0.0392157)
+albedo_color = Color(0, 1, 0, 0.02)
 fixed_size = true
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ev6xr"]
@@ -54,7 +54,7 @@ transparency = 1
 blend_mode = 1
 depth_draw_mode = 1
 shading_mode = 0
-albedo_color = Color(0, 0, 1, 0.0392157)
+albedo_color = Color(0, 0, 1, 0.02)
 fixed_size = true
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3qr8b"]
@@ -62,7 +62,7 @@ transparency = 1
 blend_mode = 1
 depth_draw_mode = 1
 shading_mode = 0
-albedo_color = Color(1, 0, 0, 0.0392157)
+albedo_color = Color(1, 0, 0, 0.02)
 fixed_size = true
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5kkp8"]

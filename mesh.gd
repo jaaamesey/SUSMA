@@ -27,12 +27,12 @@ var brush_distance := 0.8
 var brush_blend := 0.15
 
 var brush_rotation := Quaternion.IDENTITY
+var xr_brush_rotation_offset := Quaternion(Vector3.RIGHT, -PI / 2)
 
 var brush_types := ["sphere", "cube", "angle", "grab"]
 var brush_type := "sphere"
 
 var x_symmetry := true
-
 
 var last_held_brush_pos = null # Vector3 | null
 var last_raw_brush_pos := Vector3()
@@ -144,6 +144,9 @@ func _process(delta: float) -> void:
 	
 	if xr_left.get_input("ax_button"):
 		brush_size += 0.3 * delta * xr_right.get_vector2("primary").y
+	elif xr_left.get_input("by_button"):
+		var rotation_vec := xr_right.get_vector2("primary") * 1.5 * delta
+		xr_brush_rotation_offset = xr_brush_rotation_offset * Quaternion(Vector3.UP, rotation_vec.x) * Quaternion(Vector3.RIGHT, rotation_vec.y)
 	else:
 		brush_distance += brush_distance_spd * xr_right.get_vector2("primary").y
 		
@@ -161,7 +164,7 @@ func _process(delta: float) -> void:
 
 	if get_viewport().use_xr:
 		brush_pos = xr_right.global_position - brush_distance * xr_right.get_global_transform().basis.z
-		brush_rotation =  Quaternion(Vector3.RIGHT, -PI / 2) * Quaternion.from_euler(xr_right.global_rotation).inverse()
+		brush_rotation = xr_brush_rotation_offset * Quaternion.from_euler(xr_right.global_rotation).inverse()
 	if brush_type == "grab":
 		brush_rotation = Quaternion.IDENTITY
 
