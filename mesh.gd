@@ -90,7 +90,7 @@ func _ready():
 					Vector3.ZERO,
 					OPERATION_TYPE.ADD,
 					OPERATION_SHAPE.SPHERE,
-					0.1,
+					0.075,
 					0.1,
 				)
 	)
