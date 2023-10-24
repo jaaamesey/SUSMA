@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3 uid="uid://buq74sffrev0c"]
+[gd_scene load_steps=30 format=3 uid="uid://buq74sffrev0c"]
 
 [ext_resource type="Script" path="res://Marble.gd" id="1_xeddq"]
 [ext_resource type="Script" path="res://src/camera_orbit_point.gd" id="2_1kh2o"]
@@ -21,6 +21,15 @@ metallic = 0.95
 roughness = 0.3
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_f0s8u"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uow86"]
+transparency = 1
+albedo_texture = ExtResource("2_wql44")
+emission = Color(0.541176, 0.541176, 0.541176, 1)
+uv1_scale = Vector3(0.625, 0.325, 0.705)
+uv1_offset = Vector3(0.35, 0.6, 0)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_h4u2c"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_vp7cg"]
 size = Vector3(0.0478, 0.0585158, 0.122711)
@@ -153,12 +162,33 @@ current = true
 [node name="LeftController" type="XRController3D" parent="CameraOrbitPoint/XRotator/Camera3D/XROrigin3D"]
 tracker = &"left_hand"
 
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CameraOrbitPoint/XRotator/Camera3D/XROrigin3D/LeftController"]
+transform = Transform3D(1.16683e-16, -1.49012e-08, -0.0670571, 6.81975e-09, -0.601912, 5.58794e-09, -0.156018, -2.63104e-08, 8.77928e-17, -0.00639775, -0.0427021, 0.0745428)
+material_override = SubResource("StandardMaterial3D_uow86")
+mesh = SubResource("PlaneMesh_h4u2c")
+skeleton = NodePath("../../XRCamera3D")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="CameraOrbitPoint/XRotator/Camera3D/XROrigin3D/LeftController"]
+transform = Transform3D(1.32137e-16, -1.89066e-08, -0.0850823, 7.72301e-09, -0.763708, 7.08999e-09, -0.176682, -3.33827e-08, 1.11392e-16, -0.00639775, -0.0361899, 0.0745428)
+mesh = SubResource("PlaneMesh_h4u2c")
+skeleton = NodePath("../../XRCamera3D")
+
 [node name="Label3D" type="Label3D" parent="CameraOrbitPoint/XRotator/Camera3D/XROrigin3D/LeftController"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.053068, 0.0329747, -0.0730364)
 pixel_size = 0.0003
 modulate = Color(1, 1, 1, 0.262745)
 outline_modulate = Color(0, 0, 0, 0)
 text = "test"
+outline_size = 0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="ControlsOnUndersideLabel" type="Label3D" parent="CameraOrbitPoint/XRotator/Camera3D/XROrigin3D/LeftController"]
+transform = Transform3D(-2.34652e-08, 0, 0.53682, 0, 0.53682, 0, -0.53682, 0, -2.34652e-08, 0.0241302, -0.0234071, 0.0258567)
+pixel_size = 0.0003
+modulate = Color(1, 1, 1, 0.262745)
+outline_modulate = Color(0, 0, 0, 0)
+text = "Controls on underside"
 outline_size = 0
 horizontal_alignment = 2
 vertical_alignment = 2
