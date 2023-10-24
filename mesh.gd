@@ -247,6 +247,7 @@ func _process(delta: float) -> void:
 	last_raw_mouse_pos = get_viewport().get_mouse_position()
 		
 	regen_mesh(voxel_size)
+	
 	var mesh_id := mesh.get_rid().get_id()
 
 	if marbles_created and (mesh_id != last_mesh_id or marbles_created_changed):

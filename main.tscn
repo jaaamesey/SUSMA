@@ -185,8 +185,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.0748665)
 shape = SubResource("BoxShape3D_vp7cg")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="CameraOrbitPoint/XRotator/Camera3D"]
-transform = Transform3D(0.266046, -0.961922, 0.0626574, -0.559056, -0.101017, 0.822953, -0.785287, -0.253973, -0.564643, -0.318733, 0.857194, -5.86869)
-light_energy = 0.102
+transform = Transform3D(0.266046, -0.961922, 0.0626578, -0.549655, -0.0979821, 0.829625, -0.791895, -0.255159, -0.554793, -0.318733, 0.857194, -5.86869)
+light_energy = 0.667
 sky_mode = 1
 
 [node name="DirectionalLight3D2" type="DirectionalLight3D" parent="CameraOrbitPoint/XRotator/Camera3D"]

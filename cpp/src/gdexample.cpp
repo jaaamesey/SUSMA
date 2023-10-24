@@ -171,12 +171,11 @@ void GDExample::regenMesh(double voxelSize)
     openvdb::tools::volumeToMesh(*grid, points, quads);
 
     auto outputVerts = PackedVector3Array();
-    auto outputNormals = PackedVector3Array();
     for (auto point : points)
     {
         auto vert = Vector3(point.x(), point.y(), point.z());
         outputVerts.push_back(vert);
-        outputNormals.push_back(vert.normalized());
+        //outputNormals.push_back(vert.normalized());
     }
 
     auto outputTris = PackedInt32Array();
@@ -189,6 +188,23 @@ void GDExample::regenMesh(double voxelSize)
         outputTris.push_back(quad[0]);
         outputTris.push_back(quad[2]);
         outputTris.push_back(quad[3]);
+    }
+
+    // Calculate smooth normals
+    auto outputNormals = PackedVector3Array();
+    outputNormals.resize(outputVerts.size());
+    for (size_t i = 0; i < outputTris.size(); i += 3)
+    {
+        auto vector1 = outputVerts[outputTris[i + 1]] - outputVerts[outputTris[i]];
+        auto vector2 = outputVerts[outputTris[i + 2]] - outputVerts[outputTris[i]];
+        auto faceNormal = vector1.cross(vector2).normalized();
+
+        outputNormals[outputTris[i]] += faceNormal;
+        outputNormals[outputTris[i + 1]] += faceNormal;
+        outputNormals[outputTris[i + 2]] += faceNormal;
+    }
+    for (size_t i = 0; i < outputNormals.size(); i++) {
+        outputNormals[i] = -outputNormals[i].normalized();
     }
 
     auto surfaceArray = Array();
