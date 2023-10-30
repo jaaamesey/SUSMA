@@ -22,6 +22,9 @@ Godot and GDScript (its bespoke scripting language) is used for everything else,
 The following steps assume you're on Windows (x86_64). This project has not been tested on other platforms, 
 but should in theory still compile with some tweaking. 
 
+Ensure the repository is cloned recursively, i.e. submodules such as godot-cpp are included:
+`git clone --recursive https://github.com/jaaamesey/ImplicitSurfaceSculpting`
+
 ## Initial build steps
 1. Install scons with `pip install scons` - this requires [python3](https://www.python.org/downloads/)
 2. Ensure [VS build tools](https://aka.ms/vs/17/release/vs_BuildTools.exe) are installed, with 
