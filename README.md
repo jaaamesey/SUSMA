@@ -3,13 +3,10 @@
 ## Download
 Precompiled release builds for Windows can be found at https://github.com/jaaamesey/SUSMA/releases.
 
-## Demonstration videos
-
-### Keyboard & Mouse version
+## Demonstration video
 
 https://www.youtube.com/watch?v=RAlXO2y42c0
 
-### VR version
 
 ## Application architecture
 This application is a [Godot](https://godotengine.org/) project that hooks into custom C++ code through the [GDExtension](https://docs.godotengine.org/en/stable/tutorials/scripting/gdextension/what_is_gdextension.html) API.
