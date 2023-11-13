@@ -1,4 +1,14 @@
-# Application architecture
+# SUSMA: Subtraction & Union Sculpting Modelling Application
+
+## Demonstration videos
+
+### Keyboard & Mouse version
+
+https://www.youtube.com/watch?v=RAlXO2y42c0
+
+### VR version
+
+## Application architecture
 This application is a [Godot](https://godotengine.org/) project that hooks into custom C++ code through the [GDExtension](https://docs.godotengine.org/en/stable/tutorials/scripting/gdextension/what_is_gdextension.html) API.
 
 The [OpenVDB](https://www.openvdb.org/) C++ library is used for rasterizing the internal SDF representation of the sculpt to a grid, and converting it to a polygonal mesh that Godot can display. It is also used for converting meshes to SDF
@@ -17,7 +27,7 @@ Godot and GDScript (its bespoke scripting language) is used for everything else,
 
 
 
-# Build steps
+## Build steps
 
 The following steps assume you're on Windows (x86_64). This project has not been tested on other platforms, 
 but should in theory still compile with some tweaking. 
@@ -25,7 +35,7 @@ but should in theory still compile with some tweaking.
 Ensure the repository is cloned recursively, i.e. submodules such as godot-cpp are included:
 `git clone --recursive https://github.com/jaaamesey/ImplicitSurfaceSculpting`
 
-## Initial build steps
+### Initial build steps
 1. Install scons with `pip install scons` - this requires [python3](https://www.python.org/downloads/)
 2. Ensure [VS build tools](https://aka.ms/vs/17/release/vs_BuildTools.exe) are installed, with 
 "Desktop development with C++" selected during installation
@@ -62,7 +72,7 @@ and rename it to something like `godot.exe`.
 
 Once these steps are complete, you can run the project without the editor with `./_ignore/godot.exe`.
 
-## Re-building during development
+### Re-building during development
 - When any files inside `cpp/src/` are modified, you will need to run `scons` in that directory to re-build the C++ code.
 The Godot editor should probably be closed whilst this is happening.
 - If for some reason files inside `cpp/godot-cpp/` have been modified, you will need to run `scons` again in both `cpp/godot-cpp/` and `cpp/src/`.
