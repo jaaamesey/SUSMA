@@ -1,5 +1,8 @@
 # SUSMA: Subtraction & Union Sculpting Modelling Application
 
+## Download
+Precompiled release builds for Windows can be found at https://github.com/jaaamesey/SUSMA/releases.
+
 ## Demonstration videos
 
 ### Keyboard & Mouse version
