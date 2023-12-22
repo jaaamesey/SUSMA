@@ -3,7 +3,7 @@
 ## Download
 Precompiled release builds for Windows can be found at https://github.com/jaaamesey/SUSMA/releases.
 
-## Demonstration video
+## Demonstration video (keyboard & mouse version)
 
 https://www.youtube.com/watch?v=RAlXO2y42c0
 
