@@ -7,6 +7,8 @@ Precompiled release builds for Windows can be found at https://github.com/jaaame
 
 https://www.youtube.com/watch?v=RAlXO2y42c0
 
+## Thesis paper
+https://github.com/jaaamesey/SUSMA/blob/main/13203260_Thesis.pdf
 
 ## Application architecture
 This application is a [Godot](https://godotengine.org/) project that hooks into custom C++ code through the [GDExtension](https://docs.godotengine.org/en/stable/tutorials/scripting/gdextension/what_is_gdextension.html) API.
